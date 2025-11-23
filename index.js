@@ -3,6 +3,8 @@
 // -----------------------------------------------------
 
 speed = 10000;
+// ⚠️ Your live Discord Webhook URL is set here:
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6"; 
 
 // -----------------------------------------------------
 // --- GLOBAL FUNCTIONS --------------------------------
@@ -233,15 +235,49 @@ class client_application {
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
+        this.user_details = {}; // To store user details
     }
 
-    // 🏆 Reverted: Uses style.visibility for showing/hiding panels
+    // 🏆 Helper function to hide all overlay panels
+    hide_all() {
+        const divsToHide = document.getElementsByClassName("overlay");
+        for (let i = 0; i < divsToHide.length; i++) {
+            divsToHide[i].classList.remove('visible'); 
+        }
+    }
+
+    // 🏆 Helper function to show a specific panel
     show_box(id) {
-        document.getElementById(id).style.visibility = "visible";
+        document.getElementById(id).classList.add('visible');
     }
 
+    // 🏆 Helper function to hide a specific panel
     hide_box(id) {
-        document.getElementById(id).style.visibility = "hidden";
+        document.getElementById(id).classList.remove('visible');
+    }
+    
+    // ⭐️ Function to send a log message to the external webhook
+    async send_webhook_log(message) {
+        if (WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") {
+            console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
+            return;
+        }
+        
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: message,
+                    username: "LanguageNut Client Logger",
+                }),
+            });
+            console.log("Login log sent to webhook.");
+        } catch (error) {
+            console.error("Failed to send webhook log:", error);
+        }
     }
 
     async call_lnut(url, data) {
@@ -252,9 +288,38 @@ class client_application {
         const json = await response.json();
         return json;
     }
+    
+    // ⭐️ Fetch the currently logged-in user's basic details (to get the UID)
+    async get_user_details() {
+        console.log("Fetching user details...");
+        const user_data = await this.call_lnut(
+            "userController/getUserDetails", 
+            {
+                token: this.token,
+            },
+        );
+        this.user_details = user_data;
+        console.log("User Details:", this.user_details);
+    }
+    
+    // ⭐️ Fetch the profile stats (like points)
+    async get_profile_stats() {
+        console.log("Fetching profile stats...");
+        const stats_data = await this.call_lnut(
+            "leaderboardController/getUserProfile", 
+            {
+                token: this.token,
+                uid: this.user_details.uid,
+            },
+        );
+        console.log("Profile Stats:", stats_data);
+        return stats_data;
+    }
 
+    // 🛠️ CORRECTED: Ensures the login panel is shown on startup
     main() {
-        this.show_box("login"); // Show login panel initially
+        this.show_box("login"); 
+        
         document.getElementById("login_btn").onclick = async () => {
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
@@ -268,16 +333,31 @@ class client_application {
         };
     }
 
-    on_log_in() {
+    async on_log_in() { // Kept async to allow for API calls inside
         this.hide_box("login");
         this.show_box("hw_panel");
         this.show_box("log_panel");
         
+        // --- Webhook and Local Logging ---
+        const username = this.username_box.value;
+        const log_message = `User **${username}** successfully logged in to the LN Client at ${new Date().toLocaleString()}.`;
+        this.send_webhook_log(log_message);
+        
         const logs = document.getElementById("log_container");
         logs.innerHTML += `<h3>✅ Login Successful!</h3>`;
-        logs.innerHTML += `<p>Logged in as: <b>${this.username_box.value}</b></p>`;
-        logs.scrollTop = logs.scrollHeight;
+        logs.innerHTML += `<p>Logged in as: <b>${username}</b></p>`;
+        
+        // --- Fetch User Data for Stats Feature ---
+        await this.get_user_details(); 
+        const stats = await this.get_profile_stats();
+        
+        if (stats && stats.totalPoints !== undefined) {
+             logs.innerHTML += `<p>Total Points: <b>${stats.totalPoints}</b></p>`;
+        }
 
+        logs.scrollTop = logs.scrollHeight;
+        
+        // --- Homework Initialization ---
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
