@@ -8,12 +8,12 @@ body {
     font-size: 1.05rem;
     background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
-    background-size: cover; /* Changed to cover to ensure the GIF fills the screen */
+    background-size: cover;
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white; /* Ensure text is visible against the dark background */
+    color: white; 
 }
 
 button {
@@ -40,7 +40,6 @@ div {
 /* --- LOGIN/INPUT STYLES --- */
 /* ------------------------------------- */
 
-/* Styling for the input fields and button within the login form */
 .login_field {
     display: block; 
     width: 100%; 
@@ -61,7 +60,6 @@ div {
     box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.2); 
 }
 
-/* Specific styling for the Log In button */
 #login_btn { 
     background-color: lightgray; 
     color: black; 
@@ -81,22 +79,16 @@ div {
 /* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
+/* 🏆 REVERTED: Simple visibility control, no opacity/transition */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); /* Dark, full-screen background */
-    opacity: 0; 
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-    z-index: 10; /* Ensure panels are on top */
-}
-
-.overlay.visible {
-    opacity: 1;
-    visibility: visible;
+    /* Default is hidden, JS will set to visible */
+    visibility: hidden; 
+    z-index: 10; 
 }
 
 /* Specific styling for the Login box (centered) */
@@ -126,9 +118,9 @@ div {
     /* Fixed Positioning and Dimensions (The "box scale" you wanted) */
     position: fixed;
     width: 45%; 
-    max-height: 90vh; /* Allow for most of the screen height */
+    max-height: 90vh; 
     top: 50%;
-    transform: translateY(-50%); /* Center vertically */
+    transform: translateY(-50%); 
     z-index: 20;
 }
 
@@ -148,9 +140,8 @@ div {
 /* --- HOMEWORK LIST STYLES --- */
 /* ------------------------------------- */
 
-/* Scrollable container styling */
 .overflow_container {
-    max-height: 70vh; /* Allow max-height to fit the larger panel size */
+    max-height: 70vh; 
     overflow-y: scroll;
     padding: 0.5rem;
     border: 1px solid #00FF00; 
@@ -159,13 +150,11 @@ div {
     margin-top: 0.5rem;
 }
 
-/* Style for each individual task span/line */
 .task {
     display: block;
     padding: 0.2rem 0;
 }
 
-/* Style for the JSON log display */
 .json_small {
     font-family: "Space Mono", monospace;
     font-size: 0.75rem;
@@ -180,6 +169,7 @@ div {
 /* --- PROGRESS BAR STYLES --- */
 /* ------------------------------------- */
 
+/* Added container for cleaner bar display */
 .progress_bar_container {
     height: 1rem;
     background-color: #333333;
