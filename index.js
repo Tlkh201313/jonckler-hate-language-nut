@@ -258,7 +258,7 @@ class client_application {
     
     // ⭐️ Function to send a log message to the external webhook
     async send_webhook_log(message) {
-        if (WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") {
+        if (WEBHOOK_URL === "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6") {
             console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
             return;
         }
