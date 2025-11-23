@@ -1,19 +1,7 @@
-// -----------------------------------------------------
-// --- CONFIGURATION -----------------------------------
-// -----------------------------------------------------
-
 speed = 10000;
-// ⚠️ Your Discord Webhook URL is set here:
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6"; 
-
-// -----------------------------------------------------
-// --- GLOBAL FUNCTIONS --------------------------------
-// -----------------------------------------------------
-
 document.getElementById("settings_button").addEventListener("click", () => {
     document.getElementById("settings").showModal();
 });
-
 speed_input = document.getElementById("speed_slider");
 speed_input.oninput = function () {
     console.log("change", this);
@@ -27,6 +15,7 @@ function secondsToString(seconds) {
     const numdays = Math.floor((seconds % 31536000) / 86400);
     const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
+    // 💡 FIX: Rounding seconds to 1 decimal place for cleaner display
     const numseconds = parseFloat(((((seconds % 31536000) % 86400) % 3600) % 60).toFixed(1)); 
     
     return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
@@ -35,6 +24,7 @@ function secondsToString(seconds) {
 function set_checkboxes(node, state) {
     console.log(node);
     const container = document.getElementById(node);
+    // Selects/deselects all checkboxes within a specified container ID
     for (const checkbox of container.querySelectorAll("input[type=checkbox]")) {
         checkbox.checked = state;
     }
@@ -59,10 +49,6 @@ async function asyncPool(array, poolSize) {
     }
     return Promise.all(result);
 }
-
-// -----------------------------------------------------
-// --- TASK COMPLETER CLASS ----------------------------
-// -----------------------------------------------------
 
 class task_completer {
     constructor(token, task, ietf) {
@@ -100,7 +86,7 @@ class task_completer {
         console.log(vocabs);
         if (vocabs === undefined || vocabs.length === 0) {
             console.log("No vocabs found, skipping sending answers.");
-            return; 
+            return; // Stop the function if no vocabs are found
         }
         const data = {
             moduleUid: this.catalog_uid,
@@ -224,10 +210,6 @@ class task_completer {
     }
 }
 
-// -----------------------------------------------------
-// --- CLIENT APPLICATION CLASS ------------------------
-// -----------------------------------------------------
-
 class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
@@ -235,49 +217,21 @@ class client_application {
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
-        this.user_details = {}; // To store user details
     }
 
-    // 🏆 Helper function to hide all overlay panels
     hide_all() {
         const divsToHide = document.getElementsByClassName("overlay");
         for (let i = 0; i < divsToHide.length; i++) {
-            divsToHide[i].classList.remove('visible'); 
+            divsToHide[i].style.visibility = "hidden"; // or
         }
     }
 
-    // 🏆 Helper function to show a specific panel
     show_box(id) {
-        document.getElementById(id).classList.add('visible');
+        document.getElementById(id).style.visibility = "visible";
     }
 
-    // 🏆 Helper function to hide a specific panel
     hide_box(id) {
-        document.getElementById(id).classList.remove('visible');
-    }
-    
-    // ⭐️ Function to send a log message to the external webhook
-    async send_webhook_log(message) {
-        if (WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") {
-            console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
-            return;
-        }
-        
-        try {
-            await fetch(WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    content: message,
-                    username: "LanguageNut Client Logger",
-                }),
-            });
-            console.log("Login log sent to webhook.");
-        } catch (error) {
-            console.error("Failed to send webhook log:", error);
-        }
+        document.getElementById(id).style.visibility = "hidden";
     }
 
     async call_lnut(url, data) {
@@ -288,38 +242,9 @@ class client_application {
         const json = await response.json();
         return json;
     }
-    
-    // ⭐️ Fetch the currently logged-in user's basic details (to get the UID)
-    async get_user_details() {
-        console.log("Fetching user details...");
-        const user_data = await this.call_lnut(
-            "userController/getUserDetails", 
-            {
-                token: this.token,
-            },
-        );
-        this.user_details = user_data;
-        console.log("User Details:", this.user_details);
-    }
-    
-    // ⭐️ Fetch the profile stats (like points)
-    async get_profile_stats() {
-        console.log("Fetching profile stats...");
-        const stats_data = await this.call_lnut(
-            "leaderboardController/getUserProfile", 
-            {
-                token: this.token,
-                uid: this.user_details.uid,
-            },
-        );
-        console.log("Profile Stats:", stats_data);
-        return stats_data;
-    }
 
-    // 🛠️ CORRECTED: Ensures the login panel is shown on startup
     main() {
-        this.show_box("login"); 
-        
+        this.show_box("login");
         document.getElementById("login_btn").onclick = async () => {
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
@@ -333,31 +258,10 @@ class client_application {
         };
     }
 
-    async on_log_in() { // Kept async to allow for API calls inside
+    on_log_in() {
         this.hide_box("login");
         this.show_box("hw_panel");
         this.show_box("log_panel");
-        
-        // --- Webhook and Local Logging ---
-        const username = this.username_box.value;
-        const log_message = `User **${username}** successfully logged in to the LN Client at ${new Date().toLocaleString()}.`;
-        this.send_webhook_log(log_message);
-        
-        const logs = document.getElementById("log_container");
-        logs.innerHTML += `<h3>✅ Login Successful!</h3>`;
-        logs.innerHTML += `<p>Logged in as: <b>${username}</b></p>`;
-        
-        // --- Fetch User Data for Stats Feature ---
-        await this.get_user_details(); 
-        const stats = await this.get_profile_stats();
-        
-        if (stats && stats.totalPoints !== undefined) {
-             logs.innerHTML += `<p>Total Points: <b>${stats.totalPoints}</b></p>`;
-        }
-
-        logs.scrollTop = logs.scrollHeight;
-        
-        // --- Homework Initialization ---
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
@@ -389,7 +293,9 @@ class client_application {
         console.log(homeworks);
 
         const selbutton = document.getElementById("selectall");
+        // 💡 FIX: Updated select all logic to correctly target all checkboxes in the container
         selbutton.onclick = function select_checkbox() {
+            // Find all checkboxes within the entire HW container, excluding the main one itself
             const allCheckboxes = document.querySelectorAll("#hw_container input[type=checkbox]");
             for (const checkbox of allCheckboxes) {
                 checkbox.checked = this.checked;
@@ -409,9 +315,12 @@ class client_application {
         const hw_checkbox = document.createElement("input");
         hw_checkbox.type = "checkbox";
         hw_checkbox.name = "boxcheck";
+        // 💡 ADDED: Class to easily identify group checkboxes
         hw_checkbox.className = "hw-group-check"; 
         
+        // Homework Group Checkbox Logic: Selects/deselects all tasks in its group
         hw_checkbox.onclick = function () {
+            // This function uses the next sibling (hw_display) ID and the checkbox state
             set_checkboxes(this.parentNode.nextElementSibling.id, this.checked);
         };
         
@@ -429,7 +338,8 @@ class client_application {
                 this.create_task_elements(task, hw_idx, idx);
             task_span.appendChild(task_checkbox);
             task_span.appendChild(task_display);
-            task_span.appendChild(document.createElement("br"));
+            // 💡 Removed unnecessary <br> from the previous version, but leaving for consistency if needed.
+            // task_span.appendChild(document.createElement("br"));
 
             hw_display.appendChild(task_span);
             idx++;
@@ -443,17 +353,23 @@ class client_application {
         task_checkbox.name = "boxcheck";
         task_checkbox.id = `${hw_idx}-${idx}`;
 
+        // 💡 ADDED: Logic to deselect group check if a task is unchecked
         task_checkbox.onclick = function() {
+            // Find the immediate parent div container (hw_display)
             const hwGroupDiv = this.closest('div'); 
+            // Find the associated group checkbox (which is in the previous sibling span)
             const hwGroupCheck = hwGroupDiv.previousElementSibling.querySelector('.hw-group-check');
 
             if (hwGroupCheck) {
+                // Check if all tasks in the group are currently checked
                 const allTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]').length;
                 const checkedTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]:checked').length;
                 
+                // Update the group checkbox state
                 hwGroupCheck.checked = (checkedTasks === allTasks);
             }
         };
+
 
         const task_display = document.createElement("label");
         task_display.for = task_checkbox.id;
@@ -461,6 +377,7 @@ class client_application {
         task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
 
         const task_span = document.createElement("span");
+        // 💡 FIX: Added the critical 'task' class back. This is used by do_hwks() to select tasks.
         task_span.classList.add("task"); 
 
         return {
@@ -472,12 +389,11 @@ class client_application {
 
     async do_hwks() {
         const checkboxes = document.querySelectorAll(
-            ".task > input[type=checkbox]:checked",
+            // 💡 FIX: Target only the task checkboxes that are checked, excluding the group checkboxes
+            "#hw_container .task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
-        logs.innerHTML += `<p>Starting ${checkboxes.length} tasks...</p>`;
-        logs.scrollTop = logs.scrollHeight;
-
+        logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
         const progress_bar = document.getElementById("hw_bar");
         let task_id = 1;
         let progress = 0;
@@ -495,29 +411,26 @@ class client_application {
                 (async (id) => {
                     const answers = await task_doer.get_data();
                     if (answers === undefined || answers.length === 0) {
-                        logs.innerHTML += `<b>[Task ${id}]</b> No answers found, skipping.<br>`;
-                        logs.scrollTop = logs.scrollHeight;
-                        return;
+                        console.log(
+                            "No answers found, skipping sending answers.",
+                        );
+                        return; // Stop the function if no answers are found
                     }
-                    logs.innerHTML += `<b>[Task ${id}]</b> Fetched ${answers.length} vocabs.`;
-                    logs.innerHTML += `<div class="json_small">...</div>`;
-                    
+                    logs.innerHTML += `<b>fetched vocabs for task ${id}</b>`;
+                    logs.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
-                    
+                    console.log("Calling send_answers with answers:", answers);
                     const result = await task_doer.send_answers(answers);
-                    logs.innerHTML += `<b>[Task ${id}]</b> Done, scored ${result.score}.`;
-                    logs.innerHTML += `<div class="json_small">...</div>`;
+                    logs.innerHTML += `<b>task ${id} done, scored ${result.score}</b>`;
+                    logs.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
                     logs.scrollTop = logs.scrollHeight;
-                    
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
                 })(task_id++),
             );
         }
         asyncPool(funcs, 5).then(() => {
-            logs.innerHTML += `<b><p>All tasks completed. Refreshing homeworks...</p></b>`;
-            logs.scrollTop = logs.scrollHeight;
             this.display_hwks();
         });
     }
