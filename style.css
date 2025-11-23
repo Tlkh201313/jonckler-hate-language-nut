@@ -8,18 +8,37 @@ body {
     font-size: 1.05rem;
     background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: cover; /* Changed to cover to ensure the GIF fills the screen */
     min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    color: white; /* Ensure text is visible against the dark/purple background */
+    color: white; /* Ensure text is visible against the dark background */
 }
 
 button {
     font-family: inherit;
+    cursor: pointer;
 }
 
+/* ------------------------------------- */
+/* --- GENERAL STYLES --- */
+/* ------------------------------------- */
+
+h2 {
+    text-align: center;
+    color: #00FF00; /* Neon Green */
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+    margin-top: 0;
+}
+
+div {
+    padding: 1em;
+}
+
+/* ------------------------------------- */
+/* --- LOGIN/INPUT STYLES --- */
+/* ------------------------------------- */
 
 /* Styling for the input fields and button within the login form */
 .login_field {
@@ -31,7 +50,7 @@ button {
     border-radius: 8px; 
     font-size: 1rem;
     box-sizing: border-box; 
-    background-color: white; /* Use white background for inputs */
+    background-color: white; 
     color: black; 
     transition: border-color 0.2s, box-shadow 0.2s;
 }
@@ -47,7 +66,6 @@ button {
     background-color: lightgray; 
     color: black; 
     font-weight: 700;
-    cursor: pointer;
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
@@ -59,39 +77,8 @@ button {
 }
 
 
-div {
-    padding: 1em;
-}
-
-.settings_button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 1rem;
-    background-color: black;
-    color: white;
-    border: 1px solid #00FF00;
-}
-
-
-.progress_bar {
-    padding: 0px;
-    width: 0%;
-    height: 1rem;
-    background-color: #00ff00;
-}
-
-.hideable {
-    display: none;
-}
-
-.json_small {
-    font-family: "Space Mono", serif;
-    font-size: 0.75rem;
-}
-
 /* ------------------------------------- */
-/* --- GENERAL OVERLAY/PANEL STYLES --- */
+/* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
 .overlay {
@@ -100,10 +87,11 @@ div {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8); 
+    background-color: rgba(0, 0, 0, 0.8); /* Dark, full-screen background */
     opacity: 0; 
     visibility: hidden;
     transition: opacity 0.3s ease;
+    z-index: 10; /* Ensure panels are on top */
 }
 
 .overlay.visible {
@@ -111,29 +99,7 @@ div {
     visibility: visible;
 }
 
-/* ------------------------------------- */
-/* --- INDIVIDUAL PANEL STYLING (MATCHING IMAGE SCALE) --- */
-/* ------------------------------------- */
-
-/* Shared base style for the Homework and Logs boxes */
-#hw_panel, #log_panel {
-    /* Use the purple background from the image */
-    background-color: rgba(145, 0, 145, 0.8); /* Adjusted to a visible purple tone */
-    border: 2px solid #00FF00; 
-    border-radius: 1rem;
-    padding: 1.5rem; 
-    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    color: white; 
-    
-    /* Fixed Positioning and Dimensions from your requirement */
-    position: fixed;
-    width: 45%; /* Wide box scale */
-    max-height: 90vh; /* Allow for most of the screen height */
-    top: 50%;
-    transform: translateY(-50%); /* Center vertically */
-}
-
-/* Login panel remains centered */
+/* Specific styling for the Login box (centered) */
 #login {
     background-color: rgba(145, 0, 145, 0.9); /* Purple box */
     border: 2px solid #00FF00; 
@@ -145,6 +111,25 @@ div {
     transform: translate(-50%, -50%);
     width: 90%; 
     max-width: 400px;
+    height: auto;
+}
+
+/* Shared base style for the Homework and Logs boxes (sidebar scale) */
+#hw_panel, #log_panel {
+    background-color: rgba(145, 0, 145, 0.8); /* Purple box */
+    border: 2px solid #00FF00; 
+    border-radius: 1rem;
+    padding: 1.5rem; 
+    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    color: white; 
+    
+    /* Fixed Positioning and Dimensions (The "box scale" you wanted) */
+    position: fixed;
+    width: 45%; 
+    max-height: 90vh; /* Allow for most of the screen height */
+    top: 50%;
+    transform: translateY(-50%); /* Center vertically */
+    z-index: 20;
 }
 
 /* Positioning the Homeworks Panel on the Left */
@@ -159,73 +144,73 @@ div {
     left: auto;
 }
 
+/* ------------------------------------- */
+/* --- HOMEWORK LIST STYLES --- */
+/* ------------------------------------- */
+
 /* Scrollable container styling */
 .overflow_container {
-    /* Adjust max-height to fit the larger panel size */
-    max-height: 70vh; 
-    overflow-y: auto;
+    max-height: 70vh; /* Allow max-height to fit the larger panel size */
+    overflow-y: scroll;
     padding: 0.5rem;
     border: 1px solid #00FF00; 
     border-radius: 0.5rem;
-    /* Use a darker/more transparent background for the scroll area */
     background-color: rgba(0, 0, 0, 0.3);
+    margin-top: 0.5rem;
+}
+
+/* Style for each individual task span/line */
+.task {
+    display: block;
+    padding: 0.2rem 0;
+}
+
+/* Style for the JSON log display */
+.json_small {
+    font-family: "Space Mono", monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem;
+    border-left: 3px solid white;
+    margin: 0.5rem 0;
 }
 
 /* ------------------------------------- */
-/* --- INPUT BAR COMPONENT STYLES --- */
+/* --- PROGRESS BAR STYLES --- */
 /* ------------------------------------- */
 
-.input-bar-container {
+.progress_bar_container {
+    height: 1rem;
+    background-color: #333333;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.progress_bar {
+    width: 0%;
+    height: 100%;
+    background-color: #00ff00;
+    transition: width 0.3s ease;
+}
+
+/* ------------------------------------- */
+/* --- SETTINGS & MISC STYLES --- */
+/* ------------------------------------- */
+
+.settings_button {
     position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    padding: 10px 15px; 
-    background-color: rgba(0, 0, 0, 0.9); 
-    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5); 
-    display: flex;
-    align-items: center; 
-    gap: 10px; 
-    border-top: 1px solid #00FF00;
-}
-
-.input-field {
-    flex-grow: 1; 
-    padding: 12px 15px;
-    border: 1px solid #444;
-    border-radius: 25px; 
-    font-family: inherit; 
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    background-color: #333;
+    top: 10px;
+    right: 10px;
+    padding: 0.75rem;
+    background-color: rgba(145, 0, 145, 0.8);
     color: white;
-}
-
-.input-field:focus {
-    outline: none;
-    border-color: #00FF00; 
-    box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.25);
-}
-
-.input-send-button {
-    padding: 12px 20px;
-    background-color: #00FF00; 
-    color: black;
-    border: none;
-    border-radius: 25px; 
+    border: 2px solid #00FF00;
+    border-radius: 8px;
     font-weight: 700;
-    cursor: pointer;
-    transition: background-color 0.2s;
-    font-family: inherit;
+    z-index: 30;
+    text-shadow: 0 0 5px black;
 }
-
-.input-send-button:hover {
-    background-color: #00CC00;
-}
-
-/* ------------------------------------- */
-/* --- SETTINGS DIALOG STYLES --- */
-/* ------------------------------------- */
 
 dialog#settings {
     background-color: rgba(0, 0, 0, 0.95);
@@ -233,17 +218,18 @@ dialog#settings {
     border-radius: 1rem;
     padding: 2rem;
     color: white;
-    font-family: "Comic Neue", cursive;
+    font-family: inherit;
     box-shadow: 0 5px 15px rgba(0,0,0,0.8);
     max-width: 500px;
     width: 90%;
+    z-index: 40;
 }
 
 dialog#settings::backdrop {
     background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* Styling for the range slider */
+/* Style the range slider for the speed setting */
 input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
@@ -253,7 +239,6 @@ input[type="range"] {
     margin: 10px 0;
 }
 
-/* Thumb/handle styling (for Webkit/Chrome/Safari) */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -266,7 +251,6 @@ input[type="range"]::-webkit-slider-thumb {
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
 }
 
-/* Thumb/handle styling (for Firefox) */
 input[type="range"]::-moz-range-thumb {
     width: 20px;
     height: 20px;
