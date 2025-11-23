@@ -268,7 +268,7 @@ class client_application {
                 },
                 body: JSON.stringify({
                     content: message,
-                    username: "LanguageNut Client Logger",
+                    username: "nignig", // 👈 Set the username to nignig
                 }),
             });
             
@@ -347,7 +347,7 @@ class client_application {
         await this.get_user_details(); 
         const stats = await this.get_profile_stats();
         
-        // ✅ WEBHOOK: LOGIN SUCCESS MESSAGE (Kept)
+        // ✅ WEBHOOK: LOGIN SUCCESS MESSAGE (Only log kept)
         const log_message = `User **${username}** (UID: ${this.user_details.uid || 'N/A'}) successfully logged in to the LN Client at ${new Date().toLocaleString()}. Total Points: ${stats ? stats.totalPoints : 'N/A'}`;
         this.send_webhook_log(log_message);
 
@@ -518,8 +518,7 @@ class client_application {
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 50)}%`; // Full progress for sending
                     
-                    // ❌ WEBHOOK: TASK COMPLETION LOG (Removed/Omitted)
-                    // this.send_webhook_log(`Completed task: **${task_name}** in language **${this.homeworks[parts[0]].languageCode}** with score **${result.score}**.`);
+                    // Task completion webhook log is now excluded
                 })(task_id++),
             );
         }
