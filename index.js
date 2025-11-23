@@ -3,7 +3,8 @@
 // -----------------------------------------------------
 
 speed = 10000;
-const WEBHOOK_URL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6"; // ⬅️ IMPORTANT: Set your actual webhook URL here!
+// ⚠️ Your live Discord Webhook URL is set here:
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6"; 
 
 // -----------------------------------------------------
 // --- GLOBAL FUNCTIONS --------------------------------
@@ -237,7 +238,7 @@ class client_application {
         this.user_details = {}; // To store user details
     }
 
-    // 🏆 FIXED: Uses classList for visibility (matches your working HTML/CSS)
+    // 🏆 Helper function to hide all overlay panels
     hide_all() {
         const divsToHide = document.getElementsByClassName("overlay");
         for (let i = 0; i < divsToHide.length; i++) {
@@ -245,15 +246,17 @@ class client_application {
         }
     }
 
+    // 🏆 Helper function to show a specific panel
     show_box(id) {
         document.getElementById(id).classList.add('visible');
     }
 
+    // 🏆 Helper function to hide a specific panel
     hide_box(id) {
         document.getElementById(id).classList.remove('visible');
     }
     
-    // ⭐️ NEW: Function to send a log message to the external webhook
+    // ⭐️ Function to send a log message to the external webhook
     async send_webhook_log(message) {
         if (WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") {
             console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
@@ -286,7 +289,7 @@ class client_application {
         return json;
     }
     
-    // ⭐️ NEW: Fetch the currently logged-in user's basic details (to get the UID)
+    // ⭐️ Fetch the currently logged-in user's basic details (to get the UID)
     async get_user_details() {
         console.log("Fetching user details...");
         const user_data = await this.call_lnut(
@@ -299,10 +302,9 @@ class client_application {
         console.log("User Details:", this.user_details);
     }
     
-    // ⭐️ NEW: Fetch the profile stats (like points)
+    // ⭐️ Fetch the profile stats (like points)
     async get_profile_stats() {
         console.log("Fetching profile stats...");
-        // NOTE: Endpoint is hypothetical and may need adjustment based on LN API docs.
         const stats_data = await this.call_lnut(
             "leaderboardController/getUserProfile", 
             {
@@ -314,8 +316,10 @@ class client_application {
         return stats_data;
     }
 
+    // 🛠️ CORRECTED: Ensures the login panel is shown on startup
     main() {
-        // The HTML starts with 'login' visible via the 'visible' class
+        this.show_box("login"); 
+        
         document.getElementById("login_btn").onclick = async () => {
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
