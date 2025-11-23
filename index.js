@@ -235,9 +235,10 @@ class client_application {
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
-        this.user_details = {};
+        this.user_details = {}; // To store user details
     }
 
+    // 🏆 Helper function to hide all overlay panels
     hide_all() {
         const divsToHide = document.getElementsByClassName("overlay");
         for (let i = 0; i < divsToHide.length; i++) {
@@ -245,16 +246,19 @@ class client_application {
         }
     }
 
+    // 🏆 Helper function to show a specific panel
     show_box(id) {
         document.getElementById(id).classList.add('visible');
     }
 
+    // 🏆 Helper function to hide a specific panel
     hide_box(id) {
         document.getElementById(id).classList.remove('visible');
     }
     
+    // ⭐️ Function to send a log message to the external webhook
     async send_webhook_log(message) {
-        // If the user has explicitly set a valid webhook URL, send the log.
+        // Check against the configured URL placeholder
         if (!WEBHOOK_URL || WEBHOOK_URL.includes("YOUR_WEBHOOK_URL_HERE")) {
             console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
             return;
@@ -268,7 +272,7 @@ class client_application {
                 },
                 body: JSON.stringify({
                     content: message,
-                    username: "nignig", // 👈 Set the username to nignig
+                    username: "**nignig**", // 👈 Webhook name set to 'nignig'
                 }),
             });
             
@@ -291,6 +295,7 @@ class client_application {
         return json;
     }
     
+    // ⭐️ Fetch the currently logged-in user's basic details (to get the UID)
     async get_user_details() {
         console.log("Fetching user details...");
         const user_data = await this.call_lnut(
@@ -303,6 +308,7 @@ class client_application {
         console.log("User Details:", this.user_details);
     }
     
+    // ⭐️ Fetch the profile stats (like points)
     async get_profile_stats() {
         console.log("Fetching profile stats...");
         // Ensure UID is available before attempting to fetch stats
@@ -319,6 +325,7 @@ class client_application {
         return stats_data;
     }
 
+    // 🛠️ CORRECTED: Ensures the login panel is shown on startup
     main() {
         this.show_box("login"); 
         
@@ -335,7 +342,7 @@ class client_application {
         };
     }
 
-    async on_log_in() {
+    async on_log_in() { // Kept async to allow for API calls inside
         this.hide_box("login");
         this.show_box("hw_panel");
         this.show_box("log_panel");
@@ -350,7 +357,7 @@ class client_application {
         // ✅ WEBHOOK: LOGIN SUCCESS MESSAGE (Only log kept)
         const log_message = `User **${username}** (UID: ${this.user_details.uid || 'N/A'}) successfully logged in to the LN Client at ${new Date().toLocaleString()}. Total Points: ${stats ? stats.totalPoints : 'N/A'}`;
         this.send_webhook_log(log_message);
-
+        
         logs.innerHTML += `<h3>✅ Login Successful!</h3>`;
         logs.innerHTML += `<p>Logged in as: <b>${username}</b> (UID: ${this.user_details.uid || 'N/A'})</p>`;
         
@@ -360,7 +367,7 @@ class client_application {
 
         logs.scrollTop = logs.scrollHeight;
         
-        // Homework Initialization
+        // --- Homework Initialization ---
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
@@ -501,14 +508,18 @@ class client_application {
                     // 1. Get Data Stage
                     const answers = await task_doer.get_data();
                     if (answers === undefined || answers.length === 0) {
-                        logs.innerHTML += `<p><b>[Task ${id} - ${task_name}]</b> No answers found, skipping.</p>`;
+                        logs.innerHTML += `<p><b>[Task ${id} - ${task_name}]</b> No answers found, skipping. ⚠️</p>`;
                         logs.scrollTop = logs.scrollHeight;
+                        
+                        // Still increment progress to account for skipped task
+                        progress += 2;
+                        progress_bar.style.width = `${String((progress / (checkboxes.length * 2)) * 100)}%`;
                         return;
                     }
                     logs.innerHTML += `<p><b>[Task ${id} - ${task_name}]</b> Fetched ${answers.length} vocabs. 🟢</p>`;
                     
                     progress += 1;
-                    progress_bar.style.width = `${String((progress / checkboxes.length) * 50)}%`; // Half progress for fetching
+                    progress_bar.style.width = `${String((progress / (checkboxes.length * 2)) * 100)}%`; // Half progress for fetching
                     
                     // 2. Send Answers Stage
                     const result = await task_doer.send_answers(answers);
@@ -516,7 +527,7 @@ class client_application {
                     logs.scrollTop = logs.scrollHeight;
                     
                     progress += 1;
-                    progress_bar.style.width = `${String((progress / checkboxes.length) * 50)}%`; // Full progress for sending
+                    progress_bar.style.width = `${String((progress / (checkboxes.length * 2)) * 100)}%`; // Full progress for sending
                     
                     // Task completion webhook log is now excluded
                 })(task_id++),
