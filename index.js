@@ -254,6 +254,7 @@ class client_application {
     }
     
     async send_webhook_log(message) {
+        // If the user has explicitly set a valid webhook URL, send the log.
         if (!WEBHOOK_URL || WEBHOOK_URL.includes("YOUR_WEBHOOK_URL_HERE")) {
             console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
             return;
@@ -271,11 +272,10 @@ class client_application {
                 }),
             });
             
-            // Log successful or failed send attempt
             if (!response.ok) {
                  console.error(`Webhook failed with status: ${response.status}`);
             } else {
-                 console.log("Login log sent to webhook.");
+                 console.log("Log sent to webhook.");
             }
         } catch (error) {
             console.error("Failed to send webhook log:", error);
@@ -347,7 +347,7 @@ class client_application {
         await this.get_user_details(); 
         const stats = await this.get_profile_stats();
         
-        // Webhook and Local Logging
+        // ✅ WEBHOOK: LOGIN SUCCESS MESSAGE (Kept)
         const log_message = `User **${username}** (UID: ${this.user_details.uid || 'N/A'}) successfully logged in to the LN Client at ${new Date().toLocaleString()}. Total Points: ${stats ? stats.totalPoints : 'N/A'}`;
         this.send_webhook_log(log_message);
 
@@ -451,12 +451,9 @@ class client_application {
             const hwGroupCheck = hwGroupDiv.previousElementSibling.querySelector('.hw-group-check');
 
             if (hwGroupCheck) {
-                // Get all individual task checkboxes within this homework group
                 const allTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]').length;
-                // Get all checked individual task checkboxes
                 const checkedTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]:checked').length;
                 
-                // Update the group checkbox state based on the tasks' state
                 hwGroupCheck.checked = (checkedTasks === allTasks);
             }
         };
@@ -521,9 +518,8 @@ class client_application {
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 50)}%`; // Full progress for sending
                     
-                    // Webhook logging for completion
-                    this.send_webhook_log(`Completed task: **${task_name}** in language **${this.homeworks[parts[0]].languageCode}** with score **${result.score}**.`);
-                    
+                    // ❌ WEBHOOK: TASK COMPLETION LOG (Removed/Omitted)
+                    // this.send_webhook_log(`Completed task: **${task_name}** in language **${this.homeworks[parts[0]].languageCode}** with score **${result.score}**.`);
                 })(task_id++),
             );
         }
