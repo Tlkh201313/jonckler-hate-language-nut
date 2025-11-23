@@ -3,7 +3,7 @@
 
 /* --- GLOBAL BODY & FONT --- */
 body {
-    /* FIX: Changed display to 'block' to allow fixed panels to float over the content */
+    /* Ensures body behaves normally, allowing fixed panels to float */
     display: block; 
     
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
@@ -12,9 +12,10 @@ body {
     background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
     background-size: cover;
+    background-attachment: fixed; /* Prevents background image from scrolling */
     min-height: 100vh;
     color: white; 
-    margin: 0; /* Ensures no scrollbars/gaps */
+    margin: 0; 
     padding: 0;
 }
 
@@ -34,8 +35,9 @@ h2 {
     margin-top: 0;
 }
 
+/* Ensure padding is inside the element boundary */
 div {
-    padding: 1em;
+    box-sizing: border-box; 
 }
 
 /* ------------------------------------- */
@@ -81,14 +83,14 @@ div {
 /* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
-/* FIX: Use 'display: none' as the default hidden state */
 .overlay {
+    /* ✅ FIX: Use display: none as the default state to be controlled by JS */
     display: none; 
     position: fixed;
     z-index: 10;
 }
 
-/* FIX: This class is added by JS on successful login to show the panel */
+/* ✅ FIX: This class is added by JS to show the panel */
 .overlay.visible {
     display: block;
 }
@@ -117,7 +119,7 @@ div {
     box-shadow: 0 5px 15px rgba(0,0,0,0.8);
     color: white; 
     
-    /* Fixed Positioning and Dimensions (The "box scale" you wanted) */
+    /* Fixed Positioning and Dimensions */
     position: fixed;
     width: 45%; 
     max-height: 90vh; 
@@ -142,10 +144,6 @@ div {
 /* --- HOMEWORK LIST STYLES --- */
 /* ------------------------------------- */
 
-#hw_container {
-    max-height: 70vh; /* Target the specific container ID for max-height */
-}
-
 .overflow_container {
     overflow-y: scroll;
     padding: 0.5rem;
@@ -153,6 +151,8 @@ div {
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
+    /* You must define the height on the specific ID element in your HTML, or here: */
+    max-height: 70vh;
 }
 
 .task {
@@ -174,19 +174,27 @@ div {
 /* --- PROGRESS BAR STYLES --- */
 /* ------------------------------------- */
 
-#hw_bar { /* Target the ID from the HTML */
+/* This is the container/track for the progress bar */
+.progress_bar { 
     height: 1rem;
-    background-color: #333333; /* Background for the track */
+    background-color: #333333; 
     border-radius: 5px;
     overflow: hidden;
-    margin: 10px 0; /* Add some spacing */
+    margin: 10px 0; 
 }
 
-.progress_bar { /* Style for the inner moving bar */
-    width: 0%;
-    height: 100%;
+/* * ✅ FIX: Renamed 'progress_bar' to '.progress' 
+* The JavaScript uses document.getElementById("hw_bar") to get the container,
+* and then it sets the 'width' directly on this container. 
+* To be clean, we can style the container (#hw_bar) and rely on the JS setting the width.
+*/
+#hw_bar { 
+    /* This ID now acts as the container AND the bar, as controlled by JS width property */
+    width: 0%; 
+    height: 1rem;
     background-color: #00ff00;
     transition: width 0.3s ease;
+    border-radius: 5px; /* Ensure bar is visible */
 }
 
 
