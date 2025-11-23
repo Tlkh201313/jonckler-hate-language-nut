@@ -1,21 +1,13 @@
 <!DOCTYPE html>
-
 <html>
-
     <head>
-
         <meta charset="UTF-8">
-
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-        <link rel="stylesheet" href="style.css">
-
+        <link rel="stylesheet" href="style.css"> 
         <title>LN client</title>
-
     </head>
 
     <body>
-
         <img src="./languagenut.jpeg" width='30%'>
 
 
@@ -32,19 +24,22 @@
             <input type="checkbox" id="selectall">
             <label for="selectall">select all</label>
 
+            <div class="progress_bar_container">
+                <div id="hw_bar" class="progress_bar"></div>
+            </div> 
+
             <div id="hw_container" class="overflow_container">
-                </div>
+            </div>
+            
             <button id="do_hw" style="margin: 2rem 0 0 0;">DO THE HOMEWORK</button>
         </div>
 
 
         <div id="log_panel" class="overlay">
             <h2>Logs</h2>
-
-            <div id="hw_bar" class="progress_bar"></div>
-            <br>
-                <div id="log_container" class="overflow_container">
-                    </div>
+            
+            <div id="log_container" class="overflow_container">
+            </div>
         </div>
 
 
@@ -52,7 +47,7 @@
             [Esc] to exit
             <br>
             Select the time you want your homework to appear to be done in:
-            <input type="range" min="-3" max="18" value="2" id="speed_slider" step="0.1">
+            <input type="range" min="0" max="4" value="2" id="speed_slider" step="0.1"> 
             <br/>
             Current speed: <span id="speed_display"></span> 
         </dialog>
@@ -66,5 +61,4 @@
         
         <script src="index.js"></script>
     </body>
-
 </html>
