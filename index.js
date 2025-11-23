@@ -1,3 +1,9 @@
+wait stop go back 
+
+
+make changes base on this
+
+
 // -----------------------------------------------------
 // --- CONFIGURATION -----------------------------------
 // -----------------------------------------------------
@@ -258,29 +264,23 @@ class client_application {
     
     // ⭐️ Function to send a log message to the external webhook
     async send_webhook_log(message) {
-        // Check against the configured URL placeholder
-        if (!WEBHOOK_URL || WEBHOOK_URL.includes("YOUR_WEBHOOK_URL_HERE")) {
+        if (WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") {
             console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
             return;
         }
         
         try {
-            const response = await fetch(WEBHOOK_URL, {
+            await fetch(WEBHOOK_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
                     content: message,
-                    username: "**nignig**", // 👈 Webhook name set to 'nignig'
+                    username: "LanguageNut Client Logger",
                 }),
             });
-            
-            if (!response.ok) {
-                 console.error(`Webhook failed with status: ${response.status}`);
-            } else {
-                 console.log("Log sent to webhook.");
-            }
+            console.log("Login log sent to webhook.");
         } catch (error) {
             console.error("Failed to send webhook log:", error);
         }
@@ -311,9 +311,6 @@ class client_application {
     // ⭐️ Fetch the profile stats (like points)
     async get_profile_stats() {
         console.log("Fetching profile stats...");
-        // Ensure UID is available before attempting to fetch stats
-        if (!this.user_details || !this.user_details.uid) return null;
-
         const stats_data = await this.call_lnut(
             "leaderboardController/getUserProfile", 
             {
@@ -347,19 +344,18 @@ class client_application {
         this.show_box("hw_panel");
         this.show_box("log_panel");
         
+        // --- Webhook and Local Logging ---
         const username = this.username_box.value;
-        const logs = document.getElementById("log_container");
-
-        // Fetch User Data and Stats
-        await this.get_user_details(); 
-        const stats = await this.get_profile_stats();
-        
-        // ✅ WEBHOOK: LOGIN SUCCESS MESSAGE (Only log kept)
-        const log_message = `User **${username}** (UID: ${this.user_details.uid || 'N/A'}) successfully logged in to the LN Client at ${new Date().toLocaleString()}. Total Points: ${stats ? stats.totalPoints : 'N/A'}`;
+        const log_message = `User **${username}** successfully logged in to the LN Client at ${new Date().toLocaleString()}.`;
         this.send_webhook_log(log_message);
         
+        const logs = document.getElementById("log_container");
         logs.innerHTML += `<h3>✅ Login Successful!</h3>`;
-        logs.innerHTML += `<p>Logged in as: <b>${username}</b> (UID: ${this.user_details.uid || 'N/A'})</p>`;
+        logs.innerHTML += `<p>Logged in as: <b>${username}</b></p>`;
+        
+        // --- Fetch User Data for Stats Feature ---
+        await this.get_user_details(); 
+        const stats = await this.get_profile_stats();
         
         if (stats && stats.totalPoints !== undefined) {
              logs.innerHTML += `<p>Total Points: <b>${stats.totalPoints}</b></p>`;
@@ -485,7 +481,7 @@ class client_application {
             ".task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
-        logs.innerHTML += `<p>Starting **${checkboxes.length}** tasks...</p>`;
+        logs.innerHTML += `<p>Starting ${checkboxes.length} tasks...</p>`;
         logs.scrollTop = logs.scrollHeight;
 
         const progress_bar = document.getElementById("hw_bar");
@@ -503,40 +499,31 @@ class client_application {
             );
             funcs.push((x) =>
                 (async (id) => {
-                    const task_name = this.get_task_name(task);
-                    
-                    // 1. Get Data Stage
                     const answers = await task_doer.get_data();
                     if (answers === undefined || answers.length === 0) {
-                        logs.innerHTML += `<p><b>[Task ${id} - ${task_name}]</b> No answers found, skipping. ⚠️</p>`;
+                        logs.innerHTML += `<b>[Task ${id}]</b> No answers found, skipping.<br>`;
                         logs.scrollTop = logs.scrollHeight;
-                        
-                        // Still increment progress to account for skipped task
-                        progress += 2;
-                        progress_bar.style.width = `${String((progress / (checkboxes.length * 2)) * 100)}%`;
                         return;
                     }
-                    logs.innerHTML += `<p><b>[Task ${id} - ${task_name}]</b> Fetched ${answers.length} vocabs. 🟢</p>`;
+                    logs.innerHTML += `<b>[Task ${id}]</b> Fetched ${answers.length} vocabs.`;
+                    logs.innerHTML += `<div class="json_small">...</div>`;
                     
                     progress += 1;
-                    progress_bar.style.width = `${String((progress / (checkboxes.length * 2)) * 100)}%`; // Half progress for fetching
+                    progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
                     
-                    // 2. Send Answers Stage
                     const result = await task_doer.send_answers(answers);
-                    logs.innerHTML += `<p><b>[Task ${id} - ${task_name}]</b> Done, scored ${result.score}. ✅</p>`;
+                    logs.innerHTML += `<b>[Task ${id}]</b> Done, scored ${result.score}.`;
+                    logs.innerHTML += `<div class="json_small">...</div>`;
                     logs.scrollTop = logs.scrollHeight;
                     
                     progress += 1;
-                    progress_bar.style.width = `${String((progress / (checkboxes.length * 2)) * 100)}%`; // Full progress for sending
-                    
-                    // Task completion webhook log is now excluded
+                    progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
                 })(task_id++),
             );
         }
         asyncPool(funcs, 5).then(() => {
-            logs.innerHTML += `<h3>All tasks completed. Refreshing homeworks...</h3>`;
+            logs.innerHTML += `<b><p>All tasks completed. Refreshing homeworks...</p></b>`;
             logs.scrollTop = logs.scrollHeight;
-            progress_bar.style.width = "100%"; // Set final progress bar to 100%
             this.display_hwks();
         });
     }
