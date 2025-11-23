@@ -5,7 +5,6 @@
 body {
     /* FIX: Changed display to 'block' to allow fixed panels to float over the content */
     display: block; 
-    /* FIX: Removed justify-content/align-items which interfere with fixed positioning */
     
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
@@ -79,7 +78,7 @@ div {
 
 
 /* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES (THE FIX) --- */
+/* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
 /* FIX: Use 'display: none' as the default hidden state */
@@ -107,7 +106,6 @@ div {
     width: 90%; 
     max-width: 400px;
     height: auto;
-    /* FIX: Ensure the initial visible state is handled by the .visible class added in HTML */
 }
 
 /* Shared base style for the Homework and Logs boxes (sidebar scale) */
@@ -175,9 +173,6 @@ div {
 /* ------------------------------------- */
 /* --- PROGRESS BAR STYLES --- */
 /* ------------------------------------- */
-
-/* FIX: Removed .progress_bar_container as it's not in the HTML. */
-/* The HTML uses <div id="hw_bar" class="progress_bar"></div> */
 
 #hw_bar { /* Target the ID from the HTML */
     height: 1rem;
