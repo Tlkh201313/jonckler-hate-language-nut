@@ -1,8 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
 
-
+/* --- GLOBAL BODY & FONT --- */
 body {
+    /* FIX: Changed display to 'block' to allow fixed panels to float over the content */
+    display: block; 
+    /* FIX: Removed justify-content/align-items which interfere with fixed positioning */
+    
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
     font-size: 1.05rem;
@@ -10,10 +14,9 @@ body {
     background-repeat: no-repeat;
     background-size: cover;
     min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
     color: white; 
+    margin: 0; /* Ensures no scrollbars/gaps */
+    padding: 0;
 }
 
 button {
@@ -76,19 +79,19 @@ div {
 
 
 /* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES --- */
+/* --- OVERLAY / PANEL BASE STYLES (THE FIX) --- */
 /* ------------------------------------- */
 
-/* 🏆 REVERTED: Simple visibility control, no opacity/transition */
+/* FIX: Use 'display: none' as the default hidden state */
 .overlay {
+    display: none; 
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    /* Default is hidden, JS will set to visible */
-    visibility: hidden; 
-    z-index: 10; 
+    z-index: 10;
+}
+
+/* FIX: This class is added by JS on successful login to show the panel */
+.overlay.visible {
+    display: block;
 }
 
 /* Specific styling for the Login box (centered) */
@@ -104,6 +107,7 @@ div {
     width: 90%; 
     max-width: 400px;
     height: auto;
+    /* FIX: Ensure the initial visible state is handled by the .visible class added in HTML */
 }
 
 /* Shared base style for the Homework and Logs boxes (sidebar scale) */
@@ -140,8 +144,11 @@ div {
 /* --- HOMEWORK LIST STYLES --- */
 /* ------------------------------------- */
 
+#hw_container {
+    max-height: 70vh; /* Target the specific container ID for max-height */
+}
+
 .overflow_container {
-    max-height: 70vh; 
     overflow-y: scroll;
     padding: 0.5rem;
     border: 1px solid #00FF00; 
@@ -169,20 +176,24 @@ div {
 /* --- PROGRESS BAR STYLES --- */
 /* ------------------------------------- */
 
-/* Added container for cleaner bar display */
-.progress_bar_container {
+/* FIX: Removed .progress_bar_container as it's not in the HTML. */
+/* The HTML uses <div id="hw_bar" class="progress_bar"></div> */
+
+#hw_bar { /* Target the ID from the HTML */
     height: 1rem;
-    background-color: #333333;
+    background-color: #333333; /* Background for the track */
     border-radius: 5px;
     overflow: hidden;
+    margin: 10px 0; /* Add some spacing */
 }
 
-.progress_bar {
+.progress_bar { /* Style for the inner moving bar */
     width: 0%;
     height: 100%;
     background-color: #00ff00;
     transition: width 0.3s ease;
 }
+
 
 /* ------------------------------------- */
 /* --- SETTINGS & MISC STYLES --- */
