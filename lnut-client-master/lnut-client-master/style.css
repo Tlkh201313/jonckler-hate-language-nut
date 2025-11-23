@@ -1,0 +1,192 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+
+
+body {
+    font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
+    font-weight: 700;
+    font-size: 1.05rem;
+    background-image: url("./hellfire.gif");
+    background-repeat: no-repeat;
+    background-size: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white; 
+}
+
+button {
+    font-family: inherit;
+}
+
+
+/* Styling for the input fields and button within the login form */
+.login_field {
+    display: block; 
+    width: 100%; 
+    margin-bottom: 15px; 
+    padding: 12px 15px; 
+    border: 1px solid #444; 
+    border-radius: 8px; 
+    font-size: 1rem;
+    box-sizing: border-box; 
+    background-color: #333; 
+    color: white; 
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login_field:focus {
+    outline: none;
+    border-color: #00FF00; 
+    box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.2); 
+}
+
+/* Specific styling for the Log In button */
+#login_btn { 
+    background-color: #00FF00; 
+    color: black; 
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease-in-out;
+}
+
+#login_btn:hover { 
+    background-color: #00CC00; 
+}
+
+
+div {
+    padding: 1em;
+}
+
+.settings_button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    background-color: black;
+    color: white;
+    border: 1px solid #00FF00;
+}
+
+
+.progress_bar {
+    padding: 0px;
+    width: 0%;
+    height: 1rem;
+    background-color: #00ff00;
+}
+
+.hideable {
+    display: none;
+}
+
+.json_small {
+    font-family: "Space Mono", serif;
+    font-size: 0.75rem;
+}
+
+/* Overlay now takes up the whole screen and centers its content (the panels) */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0; 
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Styling for the content *inside* your .overlay divs (login, hw_panel, log_panel) */
+#login, #hw_panel, #log_panel {
+    position: relative;
+    width: 90%; 
+    max-width: 400px; 
+    background-color: rgba(0, 0, 0, 0.9); 
+    border: 2px solid #00FF00; 
+    border-radius: 1rem;
+    padding: 2rem;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    color: white; 
+}
+
+/* Style adjustment for Admin Checkbox Label (removed) */
+#login .login_field[style] {
+    margin-bottom: 20px;
+    color: white; 
+}
+
+.overflow_container {
+    max-height: 16em;
+    overflow-y: auto;
+    padding: 0.5rem;
+    border: 1px solid #00FF00; 
+    border-radius: 0.5rem;
+    background-color: #111;
+}
+
+/* ------------------------------------- */
+/* --- INPUT BAR COMPONENT STYLES --- */
+/* ------------------------------------- */
+
+.input-bar-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 15px; 
+    background-color: rgba(0, 0, 0, 0.9); 
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.5); 
+    display: flex;
+    align-items: center; 
+    gap: 10px; 
+    border-top: 1px solid #00FF00;
+}
+
+.input-field {
+    flex-grow: 1; 
+    padding: 12px 15px;
+    border: 1px solid #444;
+    border-radius: 25px; 
+    font-family: inherit; 
+    font-size: 1rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #333;
+    color: white;
+}
+
+.input-field:focus {
+    outline: none;
+    border-color: #00FF00; 
+    box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.25);
+}
+
+.input-send-button {
+    padding: 12px 20px;
+    background-color: #00FF00; 
+    color: black;
+    border: none;
+    border-radius: 25px; 
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-family: inherit;
+}
+
+.input-send-button:hover {
+    background-color: #00CC00;
+}
