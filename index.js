@@ -217,22 +217,22 @@ class client_application {
         this.homeworks = [];
     }
 
-    // 💡 FIX: Use class list for visibility to match CSS
+    // 🏆 REVERTED: Back to using style.visibility
     hide_all() {
         const divsToHide = document.getElementsByClassName("overlay");
         for (let i = 0; i < divsToHide.length; i++) {
-            divsToHide[i].classList.remove('visible'); 
+            divsToHide[i].style.visibility = "hidden";
         }
     }
 
-    // 💡 FIX: Use class list for visibility to match CSS
+    // 🏆 REVERTED: Back to using style.visibility
     show_box(id) {
-        document.getElementById(id).classList.add('visible');
+        document.getElementById(id).style.visibility = "visible";
     }
 
-    // 💡 FIX: Use class list for visibility to match CSS
+    // 🏆 REVERTED: Back to using style.visibility
     hide_box(id) {
-        document.getElementById(id).classList.remove('visible');
+        document.getElementById(id).style.visibility = "hidden";
     }
 
     async call_lnut(url, data) {
