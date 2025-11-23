@@ -3,7 +3,7 @@
 // -----------------------------------------------------
 
 speed = 10000;
-const WEBHOOK_URL = "YOUR_WEBHOOK_URL_HERE"; // ⬅️ IMPORTANT: Set your actual webhook URL here!
+const WEBHOOK_URL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6"; // ⬅️ IMPORTANT: Set your actual webhook URL here!
 
 // -----------------------------------------------------
 // --- GLOBAL FUNCTIONS --------------------------------
