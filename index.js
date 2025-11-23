@@ -1,7 +1,18 @@
+// -----------------------------------------------------
+// --- CONFIGURATION -----------------------------------
+// -----------------------------------------------------
+
 speed = 10000;
+const WEBHOOK_URL = "YOUR_WEBHOOK_URL_HERE"; // ⬅️ IMPORTANT: Set your actual webhook URL here!
+
+// -----------------------------------------------------
+// --- GLOBAL FUNCTIONS --------------------------------
+// -----------------------------------------------------
+
 document.getElementById("settings_button").addEventListener("click", () => {
     document.getElementById("settings").showModal();
 });
+
 speed_input = document.getElementById("speed_slider");
 speed_input.oninput = function () {
     console.log("change", this);
@@ -47,6 +58,10 @@ async function asyncPool(array, poolSize) {
     }
     return Promise.all(result);
 }
+
+// -----------------------------------------------------
+// --- TASK COMPLETER CLASS ----------------------------
+// -----------------------------------------------------
 
 class task_completer {
     constructor(token, task, ietf) {
@@ -208,6 +223,10 @@ class task_completer {
     }
 }
 
+// -----------------------------------------------------
+// --- CLIENT APPLICATION CLASS ------------------------
+// -----------------------------------------------------
+
 class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
@@ -215,24 +234,47 @@ class client_application {
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
+        this.user_details = {}; // To store user details
     }
 
-    // 🏆 REVERTED: Back to using style.visibility
+    // 🏆 FIXED: Uses classList for visibility (matches your working HTML/CSS)
     hide_all() {
         const divsToHide = document.getElementsByClassName("overlay");
         for (let i = 0; i < divsToHide.length; i++) {
-            divsToHide[i].style.visibility = "hidden";
+            divsToHide[i].classList.remove('visible'); 
         }
     }
 
-    // 🏆 REVERTED: Back to using style.visibility
     show_box(id) {
-        document.getElementById(id).style.visibility = "visible";
+        document.getElementById(id).classList.add('visible');
     }
 
-    // 🏆 REVERTED: Back to using style.visibility
     hide_box(id) {
-        document.getElementById(id).style.visibility = "hidden";
+        document.getElementById(id).classList.remove('visible');
+    }
+    
+    // ⭐️ NEW: Function to send a log message to the external webhook
+    async send_webhook_log(message) {
+        if (WEBHOOK_URL === "YOUR_WEBHOOK_URL_HERE") {
+            console.warn("Webhook logging skipped: WEBHOOK_URL not configured.");
+            return;
+        }
+        
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: message,
+                    username: "LanguageNut Client Logger",
+                }),
+            });
+            console.log("Login log sent to webhook.");
+        } catch (error) {
+            console.error("Failed to send webhook log:", error);
+        }
     }
 
     async call_lnut(url, data) {
@@ -243,9 +285,37 @@ class client_application {
         const json = await response.json();
         return json;
     }
+    
+    // ⭐️ NEW: Fetch the currently logged-in user's basic details (to get the UID)
+    async get_user_details() {
+        console.log("Fetching user details...");
+        const user_data = await this.call_lnut(
+            "userController/getUserDetails", 
+            {
+                token: this.token,
+            },
+        );
+        this.user_details = user_data;
+        console.log("User Details:", this.user_details);
+    }
+    
+    // ⭐️ NEW: Fetch the profile stats (like points)
+    async get_profile_stats() {
+        console.log("Fetching profile stats...");
+        // NOTE: Endpoint is hypothetical and may need adjustment based on LN API docs.
+        const stats_data = await this.call_lnut(
+            "leaderboardController/getUserProfile", 
+            {
+                token: this.token,
+                uid: this.user_details.uid,
+            },
+        );
+        console.log("Profile Stats:", stats_data);
+        return stats_data;
+    }
 
     main() {
-        this.show_box("login");
+        // The HTML starts with 'login' visible via the 'visible' class
         document.getElementById("login_btn").onclick = async () => {
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
@@ -259,10 +329,31 @@ class client_application {
         };
     }
 
-    on_log_in() {
+    async on_log_in() { // Kept async to allow for API calls inside
         this.hide_box("login");
         this.show_box("hw_panel");
         this.show_box("log_panel");
+        
+        // --- Webhook and Local Logging ---
+        const username = this.username_box.value;
+        const log_message = `User **${username}** successfully logged in to the LN Client at ${new Date().toLocaleString()}.`;
+        this.send_webhook_log(log_message);
+        
+        const logs = document.getElementById("log_container");
+        logs.innerHTML += `<h3>✅ Login Successful!</h3>`;
+        logs.innerHTML += `<p>Logged in as: <b>${username}</b></p>`;
+        
+        // --- Fetch User Data for Stats Feature ---
+        await this.get_user_details(); 
+        const stats = await this.get_profile_stats();
+        
+        if (stats && stats.totalPoints !== undefined) {
+             logs.innerHTML += `<p>Total Points: <b>${stats.totalPoints}</b></p>`;
+        }
+
+        logs.scrollTop = logs.scrollHeight;
+        
+        // --- Homework Initialization ---
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
@@ -294,7 +385,6 @@ class client_application {
         console.log(homeworks);
 
         const selbutton = document.getElementById("selectall");
-        // 💡 FIX: Corrected select all logic
         selbutton.onclick = function select_checkbox() {
             const allCheckboxes = document.querySelectorAll("#hw_container input[type=checkbox]");
             for (const checkbox of allCheckboxes) {
@@ -317,7 +407,6 @@ class client_application {
         hw_checkbox.name = "boxcheck";
         hw_checkbox.className = "hw-group-check"; 
         
-        // Homework Group Checkbox Logic
         hw_checkbox.onclick = function () {
             set_checkboxes(this.parentNode.nextElementSibling.id, this.checked);
         };
@@ -350,7 +439,6 @@ class client_application {
         task_checkbox.name = "boxcheck";
         task_checkbox.id = `${hw_idx}-${idx}`;
 
-        // 💡 FIX: Logic to deselect group check if a task is unchecked
         task_checkbox.onclick = function() {
             const hwGroupDiv = this.closest('div'); 
             const hwGroupCheck = hwGroupDiv.previousElementSibling.querySelector('.hw-group-check');
@@ -369,7 +457,6 @@ class client_application {
         task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
 
         const task_span = document.createElement("span");
-        // 💡 FIX: Added the critical 'task' class back.
         task_span.classList.add("task"); 
 
         return {
@@ -384,7 +471,9 @@ class client_application {
             ".task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
-        logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
+        logs.innerHTML += `<p>Starting ${checkboxes.length} tasks...</p>`;
+        logs.scrollTop = logs.scrollHeight;
+
         const progress_bar = document.getElementById("hw_bar");
         let task_id = 1;
         let progress = 0;
@@ -402,26 +491,29 @@ class client_application {
                 (async (id) => {
                     const answers = await task_doer.get_data();
                     if (answers === undefined || answers.length === 0) {
-                        console.log(
-                            "No answers found, skipping sending answers.",
-                        );
+                        logs.innerHTML += `<b>[Task ${id}]</b> No answers found, skipping.<br>`;
+                        logs.scrollTop = logs.scrollHeight;
                         return;
                     }
-                    logs.innerHTML += `<b>fetched vocabs for task ${id}</b>`;
-                    logs.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
+                    logs.innerHTML += `<b>[Task ${id}]</b> Fetched ${answers.length} vocabs.`;
+                    logs.innerHTML += `<div class="json_small">...</div>`;
+                    
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
-                    console.log("Calling send_answers with answers:", answers);
+                    
                     const result = await task_doer.send_answers(answers);
-                    logs.innerHTML += `<b>task ${id} done, scored ${result.score}</b>`;
-                    logs.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
+                    logs.innerHTML += `<b>[Task ${id}]</b> Done, scored ${result.score}.`;
+                    logs.innerHTML += `<div class="json_small">...</div>`;
                     logs.scrollTop = logs.scrollHeight;
+                    
                     progress += 1;
                     progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
                 })(task_id++),
             );
         }
         asyncPool(funcs, 5).then(() => {
+            logs.innerHTML += `<b><p>All tasks completed. Refreshing homeworks...</p></b>`;
+            logs.scrollTop = logs.scrollHeight;
             this.display_hwks();
         });
     }
