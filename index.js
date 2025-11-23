@@ -3,7 +3,7 @@
 // -----------------------------------------------------
 
 speed = 10000;
-// ⚠️ Your live Discord Webhook URL is set here:
+// ⚠️ Your Discord Webhook URL is set here:
 const WEBHOOK_URL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6"; 
 
 // -----------------------------------------------------
