@@ -1,9 +1,9 @@
 speed = 10000;
-let showDetailedLogs = false; // State variable for log detail visibility
 
 document.getElementById("settings_button").addEventListener("click", () => {
     document.getElementById("settings").showModal();
 });
+
 speed_input = document.getElementById("speed_slider");
 speed_input.oninput = function () {
     console.log("change", this);
@@ -11,23 +11,6 @@ speed_input.oninput = function () {
     console.log(speed, this.value);
     document.getElementById("speed_display").innerText = secondsToString(speed);
 };
-
-// --- NEW: Log Detail Toggle ---
-document.getElementById("toggle_logs_btn").addEventListener("click", function() {
-    showDetailedLogs = !showDetailedLogs;
-    this.innerText = showDetailedLogs ? "Hide Details" : "Show Details";
-    const logsContainer = document.getElementById("log_container");
-    const allLogEntries = logsContainer.querySelectorAll('.log-entry');
-    
-    allLogEntries.forEach(entry => {
-        if (showDetailedLogs) {
-            entry.classList.add('expanded');
-        } else {
-            entry.classList.remove('expanded');
-        }
-    });
-});
-// --- END NEW LOGIC ---
 
 function secondsToString(seconds) {
     const numyears = Math.floor(seconds / 31536000);
@@ -67,10 +50,35 @@ async function asyncPool(array, poolSize) {
 }
 
 class task_completer {
-// ... (rest of task_completer class remains unchanged) ...
+    constructor(token, task, languageCode) {
+        this.token = token;
+        this.task = task;
+        this.languageCode = languageCode;
+    }
+    async get_data() {
+        const res = await fetch(
+            `https://api.languagenut.com/homework/v1/${this.languageCode}/${this.task.module}/${this.task.type}/${this.task.taskUid}/data?token=${this.token}`,
+        );
+        const json = await res.json();
+        return json.answers;
+    }
+    async send_answers(answers) {
+        const data = JSON.stringify(answers);
+        const res = await fetch(
+            `https://api.languagenut.com/homework/v1/${this.languageCode}/${this.task.module}/${this.task.type}/${this.task.taskUid}/submit?token=${this.token}`,
+            {
+                method: "POST",
+                body: data,
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+        const json = await res.json();
+        return json;
+    }
 }
 
-// --- Function to toggle panels (Only references 'login', 'hw_panel', 'log_panel') ---
 function showPanel(panelId) {
     const panels = ['login', 'hw_panel', 'log_panel'];
     
@@ -88,7 +96,6 @@ function showPanel(panelId) {
         targetPanel.classList.add('visible');
     }
 }
-// --- END Panel Function ---
 
 
 class client_application {
@@ -104,9 +111,30 @@ class client_application {
         this.homeworks = [];
         this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
     }
-
-// ... (rest of webhook and logging functions) ...
-
+    async send_webhook(json) {
+        const res = await fetch(this.webhookURL, {
+            method: "POST",
+            body: JSON.stringify(json),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+        return res;
+    }
+    async log_in(username, password) {
+        const res = await fetch(
+            "https://api.languagenut.com/auth/v1/login",
+            {
+                method: "POST",
+                body: JSON.stringify({ username, password }),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            },
+        );
+        const json = await res.json();
+        return json;
+    }
     async call_lnut(url, data) {
         const url_data = new URLSearchParams(data).toString();
         const response = await fetch(
@@ -116,9 +144,7 @@ class client_application {
         return json;
     }
     
-    // Checks localStorage for a previously saved token
     check_for_saved_session() {
-        // Updated localStorage key
         const savedToken = localStorage.getItem('jonckler_token'); 
         if (savedToken) {
             this.token = savedToken;
@@ -127,60 +153,103 @@ class client_application {
         return false;
     }
 
-    // --- MAIN FUNCTION MODIFIED FOR LOGOUT FUNCTIONALITY ---
     main() {
         const loadingScreen = document.getElementById('loading_screen');
         const hasSession = this.check_for_saved_session();
 
         // Delay the transition so the user sees the loading screen animation
         setTimeout(() => {
-            // 1. Hide the loading screen
             loadingScreen.classList.add('hidden'); 
             
-            // 2. Decide where to go after loading
             if (hasSession) {
-                // Skip login, go straight to panels
                 console.log("Session found. Logging in automatically.");
                 this.on_log_in();
             } else {
-                // Show the login panel
                 showPanel('login'); 
             }
             
         }, 1500); // 1.5 seconds delay
 
-        // NEW: LOGOUT FUNCTIONALITY
+        // LOGOUT FUNCTIONALITY
         document.getElementById("logout_button").onclick = () => {
-            // Clear the saved token
             localStorage.removeItem('jonckler_token');
-            // Reload the page, forcing it to hit the login screen
             window.location.reload();
         };
 
         
         document.getElementById("login_btn").onclick = async () => {
-// ... (rest of login_btn logic) ...
-// ... (end of login_btn logic) ...
+            const username = this.username_box.value;
+            const password = this.password_box.value;
+            
+            const res = await this.log_in(username, password);
+            
+            if (res.token) {
+                this.token = res.token;
+                localStorage.setItem('jonckler_token', res.token); // Save token
+                this.on_log_in();
+            } else {
+                alert("Login failed. Check username and password.");
+            }
+        };
+
+        document.getElementById("selectall").onclick = (e) => {
+            set_checkboxes("hw_container", e.target.checked);
+        };
+        
+        document.getElementById("do_hw").onclick = () => {
+            this.do_hwks();
         };
     }
-    // --- END MAIN FUNCTION MODIFICATION ---
 
-    // ... (rest of on_log_in, display_hwks, etc. functions) ...
+    on_log_in() {
+        showPanel('hw_panel');
+        showPanel('log_panel');
+        this.display_hwks();
+    }
+
+    display_hwks() {
+        this.get_hwks().then(() => {
+            const container = document.getElementById("hw_container");
+            container.innerHTML = "";
+            
+            for (let i = 0; i < this.homeworks.length; i++) {
+                const h = this.homeworks[i];
+                const title = document.createElement("h3");
+                title.innerText = h.title;
+                title.style.color = "lightgray";
+                container.appendChild(title);
+                
+                for (let j = 0; j < h.tasks.length; j++) {
+                    const task = h.tasks[j];
+                    const taskDiv = document.createElement("div");
+                    taskDiv.className = "task";
+                    
+                    taskDiv.innerHTML = `
+                        <input type="checkbox" id="${i}-${j}" />
+                        <label for="${i}-${j}">${task.display_name} (${task.completion_percentage}%)</label>
+                    `;
+                    container.appendChild(taskDiv);
+                }
+            }
+        });
+    }
 
     async do_hwks() {
         const checkboxes = document.querySelectorAll(
             ".task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
-        const hw_bar = document.getElementById("hw_bar"); // Reference Homework bar
-        const log_bar = document.getElementById("log_bar"); // Reference Log bar
+        const hw_bar = document.getElementById("hw_bar");
+        const log_bar = document.getElementById("log_bar");
 
-        logs.innerHTML = `<span class="log-entry">Doing ${checkboxes.length} tasks...</span><br>`;
+        // Initial message
+        logs.innerHTML = `<div class="log-entry">Doing ${checkboxes.length} tasks...</div>`;
+        logs.scrollTop = logs.scrollHeight;
         
         let task_id = 1;
         let progress = 0;
         
-        hw_bar.style.width = "0%"; // Reset bars
+        hw_bar.style.width = "0%";
         log_bar.style.width = "0%";
 
         const funcs = [];
@@ -194,69 +263,85 @@ class client_application {
             );
             funcs.push((x) =>
                 (async (id) => {
+                    // --- Create the main log entry container ---
+                    const entryContainer = document.createElement('div');
+                    entryContainer.classList.add('log-entry');
+                    logs.appendChild(entryContainer);
+
+                    // --- Add the click handler to toggle details ---
+                    entryContainer.onclick = () => {
+                        entryContainer.classList.toggle('expanded');
+                    };
+
+                    // Initial summary message (Fetching)
+                    entryContainer.innerHTML = `Task ${id}: **Fetching data...**`;
+
                     const answers = await task_doer.get_data();
                     
-                    // --- UPDATED LOGGING FOR FETCHING DATA ---
-                    const entryFetch = document.createElement('span');
-                    entryFetch.classList.add('log-entry');
-                    entryFetch.innerHTML = `Task ${id}: Fetched vocabs.`;
-                    
-                    if (showDetailedLogs) {
-                        entryFetch.classList.add('expanded');
-                    }
-                    entryFetch.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
-                    logs.appendChild(entryFetch);
-                    // --- END UPDATED LOGGING ---
+                    // Add fetched JSON data
+                    const jsonSmallFetch = document.createElement('div');
+                    jsonSmallFetch.classList.add('json_small');
+                    jsonSmallFetch.textContent = JSON.stringify(answers, null, 2);
+                    entryContainer.appendChild(jsonSmallFetch);
 
                     if (answers === undefined || answers.length === 0) {
-                        console.log(
-                            "No answers found, skipping sending answers.",
-                        );
-                        entryFetch.innerHTML = `<span style="color: red;">Task ${id}: Failed (No answers found).</span>`;
+                        console.log("No answers found, skipping sending answers.");
+                        entryContainer.innerHTML = `Task ${id}: <span style="color: red;">Failed (No answers found).</span>`;
+                        logs.scrollTop = logs.scrollHeight;
                         return;
                     }
                     
+                    // Update summary message after success
+                    entryContainer.innerHTML = `Task ${id}: Fetched ${answers.length} vocabs. Click for JSON details.`;
+                    
                     // Update progress (Step 1: Fetching)
                     progress += 1;
-                    const progress_percent = (progress / checkboxes.length) * 0.5 * 100;
+                    let progress_percent = (progress / checkboxes.length) * 0.5 * 100;
                     hw_bar.style.width = `${String(progress_percent)}%`;
-                    log_bar.style.width = `${String(progress_percent)}%`; // Update Log bar
+                    log_bar.style.width = `${String(progress_percent)}%`;
                     
+                    // Change summary message to indicate next step (Sending)
+                    entryContainer.innerHTML = `Task ${id}: **Sending answers...** Click for JSON details.`;
+
                     console.log("Calling send_answers with answers:", answers);
                     const result = await task_doer.send_answers(answers);
-                    
-                    // --- UPDATED LOGGING FOR SENDING DATA ---
-                    const entrySend = document.createElement('span');
-                    entrySend.classList.add('log-entry');
-                    entrySend.innerHTML = `Task ${id}: Completed, Scored ${result.score}.`;
-                    
-                    if (showDetailedLogs) {
-                        entrySend.classList.add('expanded');
-                    }
-                    entrySend.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
-                    logs.appendChild(entrySend);
-                    // --- END UPDATED LOGGING ---
+                   
+                    // Add sent JSON data
+                    const jsonSmallSend = document.createElement('div');
+                    jsonSmallSend.classList.add('json_small');
+                    jsonSmallSend.textContent = JSON.stringify(result, null, 2);
+                    entryContainer.appendChild(jsonSmallSend);
 
+                    // Final summary message
+                    entryContainer.innerHTML = `Task ${id}: Completed, Scored **${result.score}**. Click for JSON details.`;
+                    
                     logs.scrollTop = logs.scrollHeight;
                     
                     // Update progress (Step 2: Sending)
                     progress += 1;
-                    const final_progress_percent = (progress / checkboxes.length) * 0.5 * 100;
-                    hw_bar.style.width = `${String(final_progress_percent)}%`;
-                    log_bar.style.width = `${String(final_progress_percent)}%`; // Update Log bar
+                    progress_percent = (progress / checkboxes.length) * 0.5 * 100;
+                    hw_bar.style.width = `${String(progress_percent)}%`;
+                    log_bar.style.width = `${String(progress_percent)}%`;
                 })(task_id++),
             );
         }
         asyncPool(funcs, 5).then(() => {
-            const finishedEntry = document.createElement('span');
-            finishedEntry.classList.add('log-entry');
-            finishedEntry.innerHTML = `<b>ALL TASKS COMPLETE. RELOADING HOMEWORK LIST.</b>`;
-            logs.appendChild(finishedEntry);
+            const finishedEntry = document.createElement('div');
+            finishedEntry.classList.add('log-entry');
+            finishedEntry.innerHTML = `<b>ALL TASKS COMPLETE. RELOADING HOMEWORK LIST.</b>`;
+            logs.appendChild(finishedEntry);
+            logs.scrollTop = logs.scrollHeight;
             this.display_hwks();
         });
     }
 
-// ... (rest of translation and get_hwks functions) ...
+    async get_hwks() {
+        const res = await this.call_lnut(
+            "homework/v1/list",
+            { token: this.token },
+        );
+        this.homeworks = res.homeworks;
+    }
 }
 
 app = new client_application();
