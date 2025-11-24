@@ -30,7 +30,7 @@
         </div>
 
 
-                <div id="hw_panel" class="overlay" style="left: 1%; top: 100px; transform: translateX(-20px);">
+        <div id="hw_panel" class="overlay">
             <h2>Homeworks</h2>
             <input type="checkbox" id="selectall">
             <label for="selectall">select all</label>
@@ -41,3 +41,32 @@
 
             <div id="hw_container" class="overflow_container">
             </div>
+            
+            <button id="do_hw" style="margin: 2rem;">START SELECTED HOMEWORK</button>
+        </div>
+
+
+        <div id="log_panel" class="overlay">
+            <h2>Logs</h2>
+            <div class="progress_bar_container">
+                <div id="log_bar" class="progress_bar"></div>
+            </div>
+            <div id="log_container" class="overflow_container">
+            </div>
+        </div>
+
+
+        <dialog id="settings">
+            [Esc] to exit
+            <br>
+            Select the time you want your homework to appear to be done in:
+            <input type="range" min="0" max="4" value="2" id="speed_slider" step="0.1"> 
+            <br/>
+            Current speed: <span id="speed_display"></span> 
+        </dialog>
+        
+        <button id="settings_button" class="settings_button">Settings</button>
+
+        <script src="index.js"></script>
+    </body>
+</html>
