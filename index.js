@@ -176,7 +176,7 @@ class client_application {
         return false;
     }
 
-    // MAIN function: Loading screen logic and all event listeners
+    // MAIN function: Loading screen logic restored
     main() {
         const loadingScreen = document.getElementById('loading_screen'); 
         const hasSession = this.check_for_saved_session();
@@ -197,7 +197,6 @@ class client_application {
         }, 1500); // 1500ms = 1.5 seconds loading time
 
         // Set up Event Listeners
-        // LOGOUT FIX IS HERE
         document.getElementById("logout_button").onclick = () => {
             localStorage.removeItem('jonckler_token');
             window.location.reload(); 
