@@ -194,7 +194,7 @@ class client_application {
                 showPanel('login'); 
             }
 
-        }, 1500); // 1500ms = 1.5 seconds loading time
+        }, 3000); // 1500ms = 1.5 seconds loading time
 
         // Set up Event Listeners
         document.getElementById("logout_button").onclick = () => {
