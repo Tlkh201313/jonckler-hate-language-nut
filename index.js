@@ -295,9 +295,20 @@ class client_application {
         return json;
     }
 
+    // --- MAIN FUNCTION MODIFIED FOR LOADING SCREEN ---
     main() {
-        // Show login panel on load
-        showPanel('login'); 
+        const loadingScreen = document.getElementById('loading_screen');
+
+        // Simulate a brief loading time (e.g., 2 seconds)
+        setTimeout(() => {
+            // 1. Hide the loading screen
+            loadingScreen.classList.add('hidden'); 
+            
+            // 2. Show the login panel after the loading screen is gone
+            showPanel('login'); 
+            
+        }, 1500); // 1.5 seconds delay
+
         
         document.getElementById("login_btn").onclick = async () => {
             const username = this.username_box.value;
@@ -322,14 +333,19 @@ class client_application {
             }
         };
     }
+    // --- END MAIN FUNCTION MODIFICATION ---
+
 
     on_log_in() {
         // Hide login panel
         showPanel(''); 
         
-        // Show all main panels
-        document.getElementById('hw_panel').classList.add('visible');
-        document.getElementById('log_panel').classList.add('visible');
+        // Show all main panels and trigger their animation
+        const hwPanel = document.getElementById('hw_panel');
+        const logPanel = document.getElementById('log_panel');
+        
+        hwPanel.classList.add('visible');
+        logPanel.classList.add('visible');
         
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
