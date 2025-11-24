@@ -8,9 +8,13 @@
     </head>
 
     <body>
-        <img src="./languagenut.jpeg" width='30%'>
+        <div id="loading_screen">
+            <div class="spinner"></div>
+            Loading Language Client...
+        </div>
+                <img src="./languagenut.jpeg" width='30%'>
 
-        <div id="login" class="overlay visible"> 
+        <div id="login" class="overlay"> 
             <input class="login_field" id="username_input" type="text" placeholder="Username">
             <input class="login_field" id="password_input" type="password" placeholder="Password">
             
@@ -36,12 +40,11 @@
 
         <div id="log_panel" class="overlay">
             <h2>Logs</h2>
-                <div class="progress_bar_container">
-                    <div id="log_bar" class="progress_bar"></div>
-                </div>
-                <br>
-                <div id="log_container" class="overflow_container">
-                </div>
+            <div class="progress_bar_container">
+                <div id="log_bar" class="progress_bar"></div>
+            </div>
+            <div id="log_container" class="overflow_container">
+            </div>
         </div>
 
 
