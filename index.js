@@ -197,10 +197,18 @@ class client_application {
         }, 1500); // 1500ms = 1.5 seconds loading time
 
         // Set up Event Listeners
-        // LOGOUT FIX IS HERE
+        // LOGOUT FIX: Ensure panels are hidden and login is shown immediately before reload
         document.getElementById("logout_button").onclick = () => {
             localStorage.removeItem('jonckler_token');
-            window.location.reload(); 
+            // Explicitly show the login panel and hide others for immediate visual feedback
+            showPanel('login'); 
+            document.getElementById('hw_panel').classList.remove('visible');
+            document.getElementById('log_panel').classList.remove('visible');
+
+            // Force a reload to guarantee a clean start (which will then hit the 'else' block above)
+            setTimeout(() => {
+                 window.location.reload(); 
+            }, 500); // Small delay to allow CSS transitions to start before reload
         };
 
         
