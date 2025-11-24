@@ -1,214 +1,297 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
-
-/* ------------------------------------- */
-/* --- GLOBAL BODY & FONT --- */
-/* ------------------------------------- */
-
+/* --- Base Styles --- */
 body {
-    font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
-    font-weight: 700;
-    font-size: 1.05rem;
-    background-image: url("./hellfire.gif"); 
-    background-repeat: no-repeat;
-    background-size: cover; 
-    background-attachment: fixed;
-    min-height: 100vh;
-    color: white; 
-    margin: 0; 
-    padding: 0;
+    background-color: rgb(35, 35, 35);
+    background-image: url("evil-jonkler.jpg"); /* Assuming this is the background image */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10vh;
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
+img {
+    margin-bottom: 20px;
 }
 
-img[src*="languagenut"] {
+h2 {
+    color: #00FF00;
+    text-shadow: 0 0 5px black;
+    text-align: center;
+}
+
+/* --- Panels (Containers) --- */
+.overlay {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30%;
+    min-height: 50vh;
+    padding: 20px;
+    background-color: rgba(128, 0, 128, 0.9); /* Purple background */
+    border: 3px solid #00FF00;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+        opacity 0.5s ease-in-out, 
+        transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Login Panel Styling */
+#login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    width: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.login_field {
+    width: 80%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
+}
+
+#login_btn {
+    cursor: pointer;
+    margin-top: 20px;
+    background-color: lightgray; 
+    color: black;
+    font-weight: bold;
+    border: none !important;
+}
+
+#login_btn:hover { 
+    background-color: #00CC00; 
+}
+
+
+/* Homework and Logs Panel Positioning */
+#hw_panel {
+    left: 15%;
+    transform: translate(0, -50%) translateY(100%); /* Start off screen bottom */
+}
+
+#log_panel {
+    right: 15%;
+    transform: translate(0, -50%) translateY(100%); /* Start off screen bottom */
+}
+
+/* Panel Slide-In Effect */
+.overlay.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%); /* Slide up to center position */
+}
+
+#login.visible {
+    transform: translate(-50%, -50%); /* Login stays centered */
+}
+
+
+/* --- Progress Bar Styles --- */
+.progress_bar_container {
+    width: 95%;
+    height: 15px;
+    background-color: #555;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px auto;
+    border: 1px solid #00FF00;
+}
+
+.progress_bar {
+    height: 100%;
+    width: 0%;
+    background-color: #00FF00;
+    transition: width 0.4s ease-out;
+}
+
+/* --- Homework List Styles --- */
+.overflow_container {
+    height: 30vh;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #00FF00;
+}
+
+.task {
     display: block;
-    margin: 50px auto 20px auto;
+    margin: 5px 0;
+    padding: 3px;
+    border-bottom: 1px dashed rgba(0, 255, 0, 0.3);
 }
 
-/* ------------------------------------- */
-/* --- LOADING & ANIMATION STYLES --- */
-/* ------------------------------------- */
+/* --- Logging Styles (Improved) --- */
+
+/* Shortened log entry (clickable area) */
+.log-entry {
+    display: block;
+    margin: 5px 0;
+    padding: 5px; 
+    border-left: 3px solid #00FF00;
+    font-size: 0.9rem;
+    cursor: pointer; 
+    background-color: rgba(0, 0, 0, 0.4); 
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    line-height: 1.5;
+}
+
+/* Hover effect for clickable log entry */
+.log-entry:hover {
+    background-color: rgba(0, 50, 0, 0.7); 
+}
+
+/* Hidden container for detailed JSON/long data */
+.json_small {
+    font-family: "Space Mono", monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    white-space: pre-wrap; /* Keeps formatting from JSON.stringify(..., null, 2) */
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 0.75rem;
+    border-left: 3px solid white;
+    margin-top: 5px;
+    /* HIDDEN BY DEFAULT */
+    display: none; 
+}
+
+/* Show the detailed log when the parent log-entry is expanded */
+.log-entry.expanded .json_small {
+    display: block;
+}
+
+/* Highlight the log entry when it is expanded */
+.log-entry.expanded {
+    border-left: 3px solid #FFFF00; /* Change border color when expanded */
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+
+/* --- Loading Screen Styles --- */
+#loading_screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(35, 35, 35, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    transition: opacity 1s ease-out;
+}
+
+#loading_screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.loader span {
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
+    background-color: #00FF00;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loader span:nth-child(1) { animation-delay: -0.32s; }
+.loader span:nth-child(2) { animation-delay: -0.16s; }
+
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
+}
+
+/* --- Settings Dialog --- */
+dialog {
+    padding: 20px;
+    border: 3px solid #00FF00;
+    background-color: rgba(0, 0, 0, 0.95);
+    color: white;
+    border-radius: 10px;
+}
+
+/* --- Button Styling (Shiny Effect) --- */
 
 @keyframes pulsate {
     0% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00; }
     100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
 }
 
-@keyframes loading {
-    0%{ transform: translateX(0); }
-    25%{ transform: translateX(15px); }
-    50%{ transform: translateX(-15px); }
-    75%{ transform: translateX(15px); }
-    100%{ transform: translateX(0); }
+@keyframes button_glow {
+    from {
+        box-shadow: 0 0 0px rgba(0, 255, 0, 0.5);
+    }
+    to {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.8), 0 0 5px #00FF00;
+    }
 }
 
-#loading_screen {
-    position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #00FF00;
-    font-size: 1.5rem;
-    transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
+.animated-button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: 
+        box-shadow 0.3s ease-out, 
+        transform 0.2s ease-out,
+        background-color 0.2s ease-in-out;
+    border: 2px solid #00FF00 !important; 
 }
 
-#loading_screen.hidden {
-    opacity: 0; visibility: hidden; pointer-events: none;
-}
-
-.loader { display: flex; align-items: center; margin-bottom: 20px; }
-.loader span { height: 25px; width: 25px; margin-right: 10px; border-radius: 50%; background-color: #00FF00; animation: loading 1.5s linear infinite; }
-.loader span:nth-child(1) { animation-delay: 0.1s; }
-.loader span:nth-child(2) { animation-delay: 0.2s; }
-.loader span:nth-child(3) { animation-delay: 0.3s; }
-
-/* ------------------------------------- */
-/* --- PANEL BASE STYLES (FLEXBOX) --- */
-/* ------------------------------------- */
-
-.overlay {
-    position: absolute;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    width: 45%; 
-    background-color: rgba(0, 0, 0, 0.9); 
-    height: 650px; /* FIXED HEIGHT FOR FLEX CALCULATION */
-    z-index: 10;
-    border: 1px solid #00FF00; 
-    
-    /* CRITICAL FLEXBOX FIX */
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box; 
-    
-    opacity: 0; 
-    visibility: hidden; 
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
-}
-
-.overlay.visible {
-    opacity: 1; 
-    visibility: visible;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear;
-}
-
-#hw_panel { left: 1%; top: 180px; transform: translateX(-100%); }
-#hw_panel.visible { transform: translateX(0); }
-
-#log_panel { right: 1%; top: 180px; transform: translateX(100%); }
-#log_panel.visible { transform: translateX(0); }
-
-#login {
-    left: 50%; top: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%; max-width: 400px;
-    height: auto;
-    background-color: rgba(0, 0, 0, 0.95);
-    border: 2px solid #00FF00;
-}
-#login.visible { opacity: 1; }
-
-/* ------------------------------------- */
-/* --- CONTENT & LIST STYLES --- */
-/* ------------------------------------- */
-
-h2 {
-    text-align: center; color: #00FF00;
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8); margin-top: 0;
-}
-
-h4 {
-    color: #00FF00 !important; 
-    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
-    padding-bottom: 5px; margin-bottom: 5px; margin-top: 15px !important;
-}
-
-.overflow_container {
-    overflow-y: auto;
-    padding: 0.5rem; 
-    border: 1px solid #00FF00; 
-    border-radius: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.3);
-    margin-top: 0.5rem;
-    
-    /* CRITICAL FLEXBOX FIX */
-    flex-grow: 1; 
-    max-height: unset; 
-}
-
-.task { display: block; padding: 0.2rem 0; }
-
-.log-entry {
-    margin: 5px 0; padding: 5px; 
-    border-left: 3px solid #00FF00; font-size: 0.9rem;
-    cursor: pointer; background-color: rgba(0, 0, 0, 0.4); 
-    border-radius: 4px; transition: background-color 0.2s;
-}
-
-.log-entry.expanded { border-left: 3px solid #FFFF00; background-color: rgba(0, 0, 0, 0.7); }
-.log-entry .json_small { display: none; }
-.log-entry.expanded .json_small { display: block; }
-
-
-/* ------------------------------------- */
-/* --- CONTROL ELEMENTS --- */
-/* ------------------------------------- */
-
-.progress_bar_container {
-    height: 1rem; background-color: #333333; 
-    border-radius: 5px; overflow: hidden; margin: 10px 0; 
-}
-
-.progress_bar { 
-    width: 0%; height: 100%;
-    background-color: #00ff00;
-    transition: width 0.6s ease-out; 
-    box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); 
-}
-
-#do_hw {
-    background-color: #00FF00; color: black; font-weight: 900;
-    border: 3px solid #00CC00; border-radius: 8px;
-    padding: 8px 15px; display: block; width: 100%;
-    box-sizing: border-box;
-    margin-top: 1rem; /* Space above button */
-    margin-bottom: 0; /* Important: prevents overflow at the bottom */
-    transition: background-color 0.2s, transform 0.2s;
+/* Base glow effect when hovering/active */
+.animated-button:hover,
+.animated-button:focus {
+    animation: button_glow 0.5s forwards;
+    transform: translateY(-1px); /* slight lift */
 }
 
 .settings_button {
-    position: fixed; top: 10px;
-    padding: 0.75rem; background-color: rgba(0, 0, 0, 0.8);
-    color: white; border: 2px solid #00FF00;
-    border-radius: 8px; font-weight: 700; z-index: 30;
+    position: fixed; 
+    top: 10px;
+    padding: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    z-index: 30;
+    text-shadow: 0 0 5px black;
+    /* Continuous pulsate animation */
     animation: pulsate 1.5s infinite alternate; 
 }
 
 #settings_button { right: 10px; }
-#logout_button { right: 120px; } /* Positioning for two buttons */
+#logout_button { right: 120px; }
 
-/* ------------------------------------- */
-/* --- INPUTS & DIALOGS --- */
-/* ------------------------------------- */
 
-.login_field {
-    display: block; width: 100%; margin-bottom: 15px;
-    padding: 12px 15px; border: 1px solid #444; border-radius: 8px;
-    font-size: 1rem; box-sizing: border-box; background-color: white; color: black;
-}
-
-#login_btn { background-color: lightgray; color: black; font-weight: 700; }
-
-dialog#settings {
-    background-color: rgba(0, 0, 0, 0.95); border: 2px solid #00FF00;
-    border-radius: 1rem; padding: 2rem; color: white;
-    max-width: 500px; width: 90%; z-index: 40;
+/* Specific style for START HOMEWORK button */
+#do_hw {
+    background-color: #00FF00;
+    color: black;
+    font-weight: 900;
+    border: 3px solid #00CC00;
 }
