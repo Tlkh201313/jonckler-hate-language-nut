@@ -10,7 +10,8 @@ body {
     background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
     background-size: cover;
-    min-height: 100vh;
+    background-attachment: fixed; /* Keep background static */
+    min-height: 120vh; /* FIX: Ensure the body is tall enough to scroll */
     color: white; 
     margin: 0; 
     padding: 0;
@@ -32,8 +33,9 @@ h2 {
     margin-top: 0;
 }
 
+/* Changed back to 0 padding to prevent double padding issues in the main containers */
 div {
-    padding: 1em;
+    padding: 0; 
 }
 
 /* ------------------------------------- */
@@ -81,8 +83,10 @@ div {
 
 .overlay {
     display: none; 
-    position: fixed;
+    position: absolute; /* FIX: Use absolute so they scroll with the page */
     z-index: 10;
+    /* Re-add 1.5rem padding to the overlay container itself */
+    padding: 1.5rem; 
 }
 
 .overlay.visible {
@@ -94,8 +98,7 @@ div {
     background-color: rgba(145, 0, 145, 0.9); 
     border: 2px solid #00FF00; 
     border-radius: 1rem;
-    padding: 1.5rem;
-    position: fixed;
+    position: absolute; /* FIX: Changed to absolute */
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -104,21 +107,18 @@ div {
     height: auto;
 }
 
-/* Homework and Logs panels are now centered vertically, using margin/calc for horizontal centering */
+/* Homework and Logs panels are positioned relative to the document top, not the viewport */
 #hw_panel, #log_panel {
     background-color: rgba(145, 0, 145, 0.8); 
     border: 2px solid #00FF00; 
     border-radius: 1rem;
-    padding: 1.5rem; 
     box-shadow: 0 5px 15px rgba(0,0,0,0.8);
     color: white; 
     
-    position: fixed;
-    width: 45%; /* Increased width slightly now that there's no sidebar */
+    position: absolute; /* FIX: Changed to absolute */
+    width: 45%; 
     max-height: 90vh; 
-    top: 50%;
-    transform: translateY(-50%); 
-    z-index: 20;
+    top: 100px; /* Position down from the top of the document, not centered */
 }
 
 /* Positioning the Homeworks Panel on the Left */
@@ -163,9 +163,10 @@ div {
     max-height: 65vh; 
 }
 
+/* FIX: Added back the padding to the overflow container itself, as padding was removed from the parent div */
 .overflow_container {
     overflow-y: scroll;
-    padding: 0.5rem;
+    padding: 0.5rem; 
     border: 1px solid #00FF00; 
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
@@ -211,6 +212,7 @@ div {
 /* --- SETTINGS & MISC STYLES --- */
 /* ------------------------------------- */
 
+/* Settings button remains fixed so it's always accessible */
 .settings_button {
     position: fixed;
     top: 10px;
@@ -274,7 +276,7 @@ input[type="range"]::-moz-range-thumb {
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
 }
 
-/* --- COMMAND BAR STYLES (Added based on previous image) --- */
+/* --- COMMAND BAR STYLES (Kept fixed at the bottom for accessibility) --- */
 .input-bar-container {
     position: fixed;
     bottom: 20px;
@@ -284,7 +286,7 @@ input[type="range"]::-moz-range-thumb {
     max-width: 600px;
     display: flex;
     gap: 10px;
-    z-index: 50; /* Ensure it floats over everything */
+    z-index: 50; 
 }
 
 .input-field {
