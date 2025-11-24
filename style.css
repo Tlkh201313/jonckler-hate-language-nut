@@ -113,7 +113,7 @@ div {
 
 
 /* ------------------------------------- */
-/* --- HOMEWORK / LOG LIST STYLES --- */
+/* --- HOMEWORK / LOG LIST STYLES (SMALLER) --- */
 /* ------------------------------------- */
 
 .overflow_container {
@@ -124,17 +124,17 @@ div {
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
     
-    /* FIX: Set a consistent max-height for both list containers */
-    max-height: 65vh; 
+    /* FIX: Reduced height for smaller selection area */
+    max-height: 300px; 
 }
 
 /* Explicitly set for log container too, although it uses the generic class above */
 #log_container {
-    max-height: 65vh; 
+    max-height: 300px; 
 }
 
 #hw_container {
-    max-height: 65vh; 
+    max-height: 300px; 
 }
 
 
@@ -177,7 +177,7 @@ div {
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    margin-top: 1rem !important; 
+    /* Margin is now handled in the HTML inline style, but keeping the block settings */
     transition: background-color 0.2s;
 }
 
