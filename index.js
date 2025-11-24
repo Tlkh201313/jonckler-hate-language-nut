@@ -321,8 +321,6 @@ class client_application {
                 console.log("Login failed for user:", username);
             }
         };
-        
-        // Removed command bar logic
     }
 
     on_log_in() {
