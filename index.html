@@ -4,25 +4,18 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css"> 
-        <title>Jonckler Client</title>
+        <title>LN client</title>
     </head>
 
     <body>
         <div id="loading_screen">
-            <div class="loader">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            Loading Jonckler Client...
+            <div class="spinner"></div>
+            Loading Language Client...
         </div>
         
         <img src="./languagenut.jpeg" width='30%'>
 
-                <div id="login" class="overlay" style="left: 50%; top: 50%; transform: translate(-50%, -50%); width: 90%; max-width: 400px; height: auto;"> 
+                <div id="login" class="overlay"> 
             <input class="login_field" id="username_input" type="text" placeholder="Username">
             <input class="login_field" id="password_input" type="password" placeholder="Password">
             
@@ -30,7 +23,7 @@
         </div>
 
 
-                <div id="hw_panel" class="overlay" style="left: 1%; top: 100px; transform: translateX(-150%);">
+        <div id="hw_panel" class="overlay">
             <h2>Homeworks</h2>
             <input type="checkbox" id="selectall">
             <label for="selectall">select all</label>
@@ -46,7 +39,7 @@
         </div>
 
 
-                <div id="log_panel" class="overlay" style="right: 1%; top: 100px; transform: translateX(150%);">
+        <div id="log_panel" class="overlay">
             <h2>Logs</h2>
             <div class="progress_bar_container">
                 <div id="log_bar" class="progress_bar"></div>
