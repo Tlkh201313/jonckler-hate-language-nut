@@ -11,7 +11,7 @@ body {
     /* FIX: Set cover size and min-height for scrollability */
     background-size: cover; 
     background-attachment: fixed;
-    min-height: 120vh; /* Ensures vertical scrolling is possible */
+    min-height: 120vh; 
     color: white; 
     margin: 0; 
     padding: 0;
@@ -28,13 +28,12 @@ button {
 
 h2 {
     text-align: center;
-    color: #00FF00; /* Neon Green */
+    color: #00FF00;
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
     margin-top: 0;
 }
 
 div {
-    /* FIX: Set padding back to 0 for containers to prevent double padding issues */
     padding: 0;
 }
 
@@ -44,7 +43,7 @@ div {
 
 .login_field {
     display: block; 
-    width: 100%; /* Added: Ensure fields take full width in login box */
+    width: 100%; 
     margin-bottom: 15px; 
     padding: 12px 15px; 
     border: 1px solid #444; 
@@ -75,27 +74,24 @@ div {
 /* ------------------------------------- */
 
 .overlay {
-    position: absolute; /* Changed from fixed to absolute for scrolling */
+    position: absolute; 
     border-radius: 1rem;
-    padding: 1.5rem; /* Added: Padding inside the panel */
+    padding: 1.5rem;
     width: 45%; 
-    background-color: rgba(145, 0, 145, 0.8); /* Used your purple/pink theme */
+    background-color: rgba(145, 0, 145, 0.8); 
     visibility: hidden;
-    /* Removed fixed height, using max-height on specific panels/containers */
     max-height: 90vh; 
     z-index: 10;
 }
 
-/* Displays the panels when JS sets the class */
 .overlay.visible {
     visibility: visible; 
 }
 
-
-/* Specific positioning for the side panels */
+/* Position side-by-side */
 #hw_panel {
     left: 1%; 
-    top: 100px; /* Positioned down from the top of the document */
+    top: 100px;
 }
 
 #log_panel {
@@ -103,7 +99,7 @@ div {
     top: 100px;
 }
 
-/* Positioning for the login panel (should always be centered, even if absolute) */
+/* Login panel centering */
 #login {
     background-color: rgba(145, 0, 145, 0.9); 
     border: 2px solid #00FF00;
@@ -120,21 +116,24 @@ div {
 /* --- HOMEWORK / LOG LIST STYLES --- */
 /* ------------------------------------- */
 
-/* This manages the scrollable area height */
 .overflow_container {
     overflow-y: scroll;
-    padding: 0.5rem; /* Added: Inner padding */
-    border: 1px solid #00FF00; /* Added: Neon border */
+    padding: 0.5rem; 
+    border: 1px solid #00FF00; 
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
     
-    /* FIX: Using a high viewport height relative to the panel to ensure scrollability */
+    /* FIX: Set a consistent max-height for both list containers */
     max-height: 65vh; 
 }
 
-/* Explicitly target the Logs container for clarity, though it uses the generic class */
+/* Explicitly set for log container too, although it uses the generic class above */
 #log_container {
+    max-height: 65vh; 
+}
+
+#hw_container {
     max-height: 65vh; 
 }
 
@@ -155,7 +154,7 @@ div {
 /* ------------------------------------- */
 
 .settings_button {
-    position: fixed; /* Kept fixed so it stays in the corner while scrolling */
+    position: fixed; 
     top: 10px;
     right: 10px;
     padding: 0.75rem;
@@ -195,7 +194,6 @@ div {
 }
 
 .progress_bar { 
-    /* Inherited from template, but fixed position */
     padding: 0;
     width: 0%;
     height: 100%;
@@ -203,7 +201,7 @@ div {
     transition: width 0.3s ease;
 }
 
-/* Other miscellaneous styles (e.g., dialog, range slider, task) */
+/* Other miscellaneous styles */
 .task {
     display: block;
     padding: 0.2rem 0;
@@ -257,7 +255,6 @@ input[type="range"]::-moz-range-thumb {
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
 }
 
-/* Your original template included a .hideable class, though 'visibility: hidden' on .overlay is used instead. */
 .hideable {
     display: none;
 }
