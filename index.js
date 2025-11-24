@@ -157,7 +157,7 @@ class client_application {
         const loadingScreen = document.getElementById('loading_screen');
         const hasSession = this.check_for_saved_session();
 
-        // Delay the transition so the user sees the loading screen animation
+        // FIX: Enforces a 1.5 second loading screen delay (1500ms)
         setTimeout(() => {
             loadingScreen.classList.add('hidden'); 
             
@@ -168,7 +168,7 @@ class client_application {
                 showPanel('login'); 
             }
             
-        }, 1500); // 1.5 seconds delay
+        }, 1500);
 
         // LOGOUT FUNCTIONALITY
         document.getElementById("logout_button").onclick = () => {
@@ -185,7 +185,7 @@ class client_application {
             
             if (res.token) {
                 this.token = res.token;
-                localStorage.setItem('jonckler_token', res.token); // Save token
+                localStorage.setItem('jonckler_token', res.token);
                 this.on_log_in();
             } else {
                 alert("Login failed. Check username and password.");
@@ -242,7 +242,6 @@ class client_application {
         const hw_bar = document.getElementById("hw_bar");
         const log_bar = document.getElementById("log_bar");
 
-        // Initial message
         logs.innerHTML = `<div class="log-entry">Doing ${checkboxes.length} tasks...</div>`;
         logs.scrollTop = logs.scrollHeight;
         
