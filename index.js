@@ -1,21 +1,19 @@
-speed = 10000;
+speed = 10000; // Default speed
 
 document.getElementById("settings_button").addEventListener("click", () => {
     document.getElementById("settings").showModal();
 });
 
-speed_input = document.getElementById("speed_slider");
-speed_input.oninput = function () {
-    console.log("change", this);
-    speed = 10 ** this.value; 
-    console.log(speed, this.value);
-    document.getElementById("speed_display").innerText = secondsToString(speed);
-};
-
-// Set the initial value display when the page loads
+const speed_input = document.getElementById("speed_slider");
+// Ensure initial display value is correct
 if (speed_input) {
-    document.getElementById("speed_display").innerText = secondsToString(10 ** speed_input.value);
+    document.getElementById("speed_display").innerText = secondsToString(10 ** 2); // Default is 2
+    speed_input.oninput = function () {
+        speed = 10 ** this.value;
+        document.getElementById("speed_display").innerText = secondsToString(speed);
+    };
 }
+
 
 function secondsToString(seconds) {
     const numyears = Math.floor(seconds / 31536000);
@@ -35,7 +33,6 @@ function secondsToString(seconds) {
 }
 
 function set_checkboxes(node, state) {
-    console.log("Setting checkboxes for:", node, "to state:", state);
     const container = document.getElementById(node);
     if (container) {
         for (const checkbox of container.querySelectorAll("input[type=checkbox]")) {
@@ -72,6 +69,7 @@ class task_completer {
         this.task = task;
         this.languageCode = languageCode;
     }
+    // Updated API call based on the homework structure you need
     async get_data() {
         const res = await fetch(
             `https://api.languagenut.com/homework/v1/${this.languageCode}/${this.task.module}/${this.task.type}/${this.task.taskUid}/data?token=${this.token}`,
@@ -120,33 +118,22 @@ class client_application {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
         
-        // This webhook URL is based on your previous input
-        this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
+        // Use the old API endpoint for token retrieval
+        this.loginEndpoint = "https://api.languagenut.com/auth/v1/login"; 
 
-        this.token = "MOCK_TOKEN_FAST_ACCESS"; 
+        // Placeholder for webhook (replace with your actual URL if needed)
+        this.webhookURL = "YOUR_DISCORD_WEBHOOK_URL_HERE"; 
+
+        this.token = null; 
         this.module_translations = [];
         this.display_translations = [];
         this.homeworks = [];
-        this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
     }
-    async send_webhook(json) {
-        try {
-            const res = await fetch(this.webhookURL, {
-                method: "POST",
-                body: JSON.stringify(json),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-            console.log("Webhook sent:", res.status);
-            return res;
-        } catch (error) {
-            console.error("Error sending webhook:", error);
-        }
-    }
+    
+    // Simple log in using the modern L-Nut API
     async log_in(username, password) {
         const res = await fetch(
-            "https://api.languagenut.com/auth/v1/login",
+            this.loginEndpoint,
             {
                 method: "POST",
                 body: JSON.stringify({ username, password }),
@@ -158,6 +145,7 @@ class client_application {
         const json = await res.json();
         return json;
     }
+    
     async call_lnut(url, data) {
         const url_data = new URLSearchParams(data).toString();
         const response = await fetch(
@@ -167,7 +155,6 @@ class client_application {
         return json;
     }
     
-    // Check for saved session now only checks for the token
     check_for_saved_session() {
         const savedToken = localStorage.getItem('jonckler_token'); 
         
@@ -190,7 +177,6 @@ class client_application {
 
             // Show the appropriate panels
             if (hasSession) {
-                console.log("Session found. Logging in automatically.");
                 this.on_log_in();
             } else {
                 showPanel('login'); 
@@ -203,15 +189,9 @@ class client_application {
             // Clear the token to force log out
             localStorage.removeItem('jonckler_token');
             
-            // Explicitly show the login panel and hide others for immediate visual feedback
+            // Show login panel and force reload
             showPanel('login'); 
-            document.getElementById('hw_panel').classList.remove('visible');
-            document.getElementById('log_panel').classList.remove('visible');
-
-            // Force a reload to guarantee a clean start
-            setTimeout(() => {
-                 window.location.reload(); 
-            }, 500); 
+            setTimeout(() => { window.location.reload(); }, 500); 
         };
 
         
@@ -219,6 +199,7 @@ class client_application {
             const username = this.username_box.value;
             const password = this.password_box.value;
             
+            // Use the correct, modern API call
             const res = await this.log_in(username, password);
             
             if (res.token) {
@@ -241,10 +222,9 @@ class client_application {
             this.do_hwks();
         };
         
-        // Add log entry click handler (for existing and future logs)
+        // Add log entry click handler
         document.getElementById("log_container").addEventListener('click', (e) => {
             let target = e.target;
-            // Check if the click target or its parent is a log-entry
             while (target != null && !target.classList.contains('log-entry')) {
                 target = target.parentElement;
             }
@@ -255,6 +235,7 @@ class client_application {
     }
 
     on_log_in() {
+        // Show both main panels after successful login
         showPanel('hw_panel');
         showPanel('log_panel');
         this.display_hwks();
@@ -275,12 +256,9 @@ class client_application {
 
                 const module_name = hw.module_name || 'Undefined Module';
 
-                // Check if the current homework belongs to a new module/topic and add a header
                 if (module_name !== currentModule) {
                      const header = document.createElement('h4');
                      header.textContent = module_name;
-                     header.style.color = '#fff';
-                     header.style.marginTop = '10px';
                      container.appendChild(header);
                      currentModule = module_name;
                 }
@@ -352,7 +330,7 @@ class client_application {
         const taskFunctions = selectedTasks.map((task, i) => async () => {
             const currentLog = document.createElement('div');
             currentLog.className = 'log-entry';
-            logContainer.prepend(currentLog); // Add the log entry to the top
+            logContainer.prepend(currentLog); 
 
             const updateLog = (message) => {
                 currentLog.innerHTML = message + currentLog.innerHTML;
@@ -374,7 +352,7 @@ class client_application {
                 </div>`;
                 
                 // 3. Fake a delay before submission
-                const delay = speed + (Math.random() * 5000); // Base speed + up to 5s jitter
+                const delay = speed + (Math.random() * 5000); 
                 updateLog(`Waiting for ${(delay / 1000).toFixed(1)} seconds...<br>`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 
@@ -391,26 +369,8 @@ class client_application {
                 const progressWidth = ((i + 1) / selectedTasks.length) * 100;
                 progressBar.style.width = `${progressWidth}%`;
 
-                // 6. Log success to Discord
-                await this.send_webhook({
-                    content: `[Jonckler Client] Task completed: **${task.display_name}** (${task.languageCode})`,
-                    embeds: [{
-                        title: "Homework Completed",
-                        description: `Module: ${task.module_name}\nTask: ${task.display_name}\nType: ${task.type}`,
-                        color: 65280 
-                    }]
-                });
-
             } catch (error) {
                 updateLog(`<span style="color: red; font-weight: bold;">ERROR: ${error.message}</span><br>`);
-                await this.send_webhook({
-                    content: `[Jonckler Client] ERROR: ${task.display_name}`,
-                    embeds: [{
-                        title: "Task Error",
-                        description: `Error for task: ${task.display_name}\nError details: ${error.message}`,
-                        color: 16711680 
-                    }]
-                });
             } finally {
                  // Ensure the current log entry is clickable for details
                  currentLog.onclick = function() {
