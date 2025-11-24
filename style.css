@@ -93,25 +93,10 @@ div {
     top: 100px;
 }
 
-/* Main panels on the right */
 #log_panel {
     right: 1%;
     top: 100px;
-    margin-bottom: 1rem; /* Space before the new panel */
 }
-
-/* --- NEW BOTTOM RIGHT CHAT PANEL POSITIONING --- */
-#bottom_right_panel {
-    right: 1%;
-    /* Position relative to the element above it, using calc for dynamic top position */
-    top: 100px; /* Start at the same top position as log panel */
-    margin-top: 250px; /* Push it down below log panel height + margin */
-    height: auto;
-    width: 45%;
-    max-height: 100px; /* Keep it small */
-}
-/* ----------------------------------------------- */
-
 
 /* Login panel centering */
 #login {
@@ -127,7 +112,7 @@ div {
 
 
 /* ------------------------------------- */
-/* --- HOMEWORK / LOG LIST STYLES (SMALLER) --- */
+/* --- HOMEWORK / LOG LIST STYLES (RESTORED HEIGHT) --- */
 /* ------------------------------------- */
 
 .overflow_container {
@@ -137,6 +122,7 @@ div {
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
+    /* RESTORED HEIGHT */
     max-height: 300px; 
 }
 
@@ -157,43 +143,6 @@ div {
     padding: 0.5rem;
     border-left: 3px solid white;
     margin: 0.5rem 0;
-}
-
-
-/* ------------------------------------- */
-/* --- CHAT UI STYLES --- */
-/* ------------------------------------- */
-#chat_container {
-    display: flex;
-    align-items: center;
-    padding: 0.5rem 0;
-}
-
-#chat_input {
-    flex-grow: 1; 
-    padding: 10px;
-    margin-right: 10px;
-    border: 1px solid #00FF00;
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.9);
-    font-family: inherit;
-    font-size: 1rem;
-    color: black;
-}
-
-#chat_send_btn {
-    background-color: #00FF00;
-    color: black;
-    font-weight: 900;
-    border: 3px solid #00CC00;
-    border-radius: 8px;
-    padding: 10px 15px;
-    flex-shrink: 0;
-    transition: background-color 0.2s;
-}
-
-#chat_send_btn:hover {
-    background-color: #00CC00;
 }
 
 
