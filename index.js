@@ -99,7 +99,7 @@ class task_completer {
 function showPanel(panelId) {
     const panels = ['login', 'hw_panel', 'log_panel'];
     
-    // Hide all main panels (using the panel's transition)
+    // Hide all main panels
     panels.forEach(id => {
         const panel = document.getElementById(id);
         if (panel) {
@@ -107,7 +107,7 @@ function showPanel(panelId) {
         }
     });
 
-    // Show the target panel (triggering its transition)
+    // Show the target panel
     const targetPanel = document.getElementById(panelId);
     if (targetPanel) {
         targetPanel.classList.add('visible');
@@ -167,8 +167,10 @@ class client_application {
         return json;
     }
     
+    // Check for saved session now only checks for the token
     check_for_saved_session() {
         const savedToken = localStorage.getItem('jonckler_token'); 
+        
         if (savedToken) {
             this.token = savedToken;
             return true;
@@ -176,7 +178,7 @@ class client_application {
         return false;
     }
 
-    // MAIN function: Loading screen logic restored
+    // MAIN function: Loading screen logic and all event listeners
     main() {
         const loadingScreen = document.getElementById('loading_screen'); 
         const hasSession = this.check_for_saved_session();
@@ -198,8 +200,18 @@ class client_application {
 
         // Set up Event Listeners
         document.getElementById("logout_button").onclick = () => {
+            // Clear the token to force log out
             localStorage.removeItem('jonckler_token');
-            window.location.reload(); 
+            
+            // Explicitly show the login panel and hide others for immediate visual feedback
+            showPanel('login'); 
+            document.getElementById('hw_panel').classList.remove('visible');
+            document.getElementById('log_panel').classList.remove('visible');
+
+            // Force a reload to guarantee a clean start
+            setTimeout(() => {
+                 window.location.reload(); 
+            }, 500); 
         };
 
         
@@ -211,7 +223,10 @@ class client_application {
             
             if (res.token) {
                 this.token = res.token;
+
+                // Save token for future auto-login
                 localStorage.setItem('jonckler_token', res.token);
+                
                 this.on_log_in();
             } else {
                 alert("Login failed. Check username and password.");
