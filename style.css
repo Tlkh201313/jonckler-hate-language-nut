@@ -9,11 +9,11 @@ body {
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
     font-size: 1.05rem;
-    background-image: url("./hellfire.gif");
+    background-image: url("./hellfire.gif"); /* Jonckler theme background */
     background-repeat: no-repeat;
     background-size: cover; 
     background-attachment: fixed;
-    min-height: 100vh; 
+    min-height: 100vh;
     color: white; 
     margin: 0; 
     padding: 0;
@@ -24,6 +24,7 @@ button {
     cursor: pointer;
 }
 
+/* Ensure the logo is properly placed */
 img[src*="languagenut"] {
     display: block;
     margin: 50px auto 20px auto;
@@ -45,6 +46,15 @@ img[src*="languagenut"] {
     75%{ transform: translateX(15px); }
     100%{ transform: translateX(0); }
 }
+
+/* Delay for the wave effect */
+.loader span:nth-child(1) { animation-delay: 0.1s; }
+.loader span:nth-child(2) { animation-delay: 0.2s; }
+.loader span:nth-child(3) { animation-delay: 0.3s; }
+.loader span:nth-child(4) { animation-delay: 0.4s; }
+.loader span:nth-child(5) { animation-delay: 0.5s; }
+.loader span:nth-child(6) { animation-delay: 0.6s; }
+
 
 /* ------------------------------------- */
 /* --- LOADING SCREEN STYLES --- */
@@ -70,7 +80,7 @@ img[src*="languagenut"] {
 #loading_screen.hidden {
     opacity: 0;
     visibility: hidden;
-    pointer-events: none;
+    pointer-events: none;
 }
 
 .loader {
@@ -88,14 +98,6 @@ img[src*="languagenut"] {
     animation: loading 1.5s linear infinite;
 }
 
-/* Delay for the wave effect */
-.loader span:nth-child(1) { animation-delay: 0.1s; }
-.loader span:nth-child(2) { animation-delay: 0.2s; }
-.loader span:nth-child(3) { animation-delay: 0.3s; }
-.loader span:nth-child(4) { animation-delay: 0.4s; }
-.loader span:nth-child(5) { animation-delay: 0.5s; }
-.loader span:nth-child(6) { animation-delay: 0.6s; }
-
 
 /* ------------------------------------- */
 /* --- GENERAL STYLES & HEADINGS --- */
@@ -106,6 +108,14 @@ h2 {
     color: #00FF00;
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
     margin-top: 0;
+}
+
+h4 {
+    color: #00FF00 !important; 
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    margin-top: 15px !important;
 }
 
 
@@ -138,7 +148,7 @@ h2 {
 
 #login_btn:hover { 
     background-color: #00CC00; 
-    transform: scale(1.02);
+    transform: scale(1.02); 
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
 }
 
@@ -152,10 +162,11 @@ h2 {
     border-radius: 1rem;
     padding: 1.5rem;
     width: 45%; 
-    background-color: rgba(0, 0, 0, 0.9);
+    background-color: rgba(0, 0, 0, 0.9); 
     max-height: 80vh;
     z-index: 10;
-    
+    border: 1px solid #00FF00; 
+    
     opacity: 0; 
     visibility: hidden; 
     transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
@@ -299,17 +310,17 @@ h2 {
     font-weight: 900;
     border: 3px solid #00CC00;
     border-radius: 8px;
-    padding: 10px 20px;
+    padding: 8px 15px; /* Fixed: Smaller padding */
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    margin: 2rem 0 0 0; 
+    margin: 1rem 0 0 0; /* Fixed: Smaller top margin */
     transition: background-color 0.2s, transform 0.2s;
 }
 
 #do_hw:hover {
     background-color: #00CC00;
-    transform: translateY(-2px);
+    transform: scale(1.01); 
 }
 
 .progress_bar_container {
