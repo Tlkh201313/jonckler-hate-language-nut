@@ -1,24 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
 
+/* ------------------------------------- */
 /* --- GLOBAL BODY & FONT --- */
+/* ------------------------------------- */
+
 body {
-    font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
-    font-weight: 700;
-    font-size: 1.05rem;
-    background-image: url("./hellfire.gif");
-    background-repeat: no-repeat;
-    background-size: cover; 
-    background-attachment: fixed;
-    min-height: 120vh; 
-    color: white; 
-    margin: 0; 
-    padding: 0;
+    font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
+    font-weight: 700;
+    font-size: 1.05rem;
+    background-image: url("./hellfire.gif");
+    background-repeat: no-repeat;
+    background-size: cover; 
+    background-attachment: fixed;
+    min-height: 100vh; 
+    color: white; 
+    margin: 0; 
+    padding: 0;
 }
 
 button {
-    font-family: inherit;
-    cursor: pointer;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+img[src*="languagenut"] {
+    display: block;
+    margin: 50px auto 20px auto;
 }
 
 /* ------------------------------------- */
@@ -26,67 +34,58 @@ button {
 /* ------------------------------------- */
 
 @keyframes pulsate {
-    0% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00; }
-    100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
+    0% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00; }
+    100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
 }
 
-/* NEW DOT ANIMATION KEYFRAMES */
 @keyframes loading {
-    0%{
-     transform: translateX(0);
-    }
-    25%{
-     transform: translateX(15px);
-    }
-    50%{
-     transform: translateX(-15px);
-    }
-    100%{
-     transform: translateX(0);
-    }
+    0%{ transform: translateX(0); }
+    25%{ transform: translateX(15px); }
+    50%{ transform: translateX(-15px); }
+    75%{ transform: translateX(15px); }
+    100%{ transform: translateX(0); }
 }
-
 
 /* ------------------------------------- */
-/* --- LOADING SCREEN STYLES (UPDATED) --- */
+/* --- LOADING SCREEN STYLES --- */
 /* ------------------------------------- */
 
 #loading_screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95); /* Deep black background */
-    z-index: 1000; /* Ensure it's on top of everything */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #00FF00;
-    font-size: 1.5rem;
-    transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #00FF00;
+    font-size: 1.5rem;
+    transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
 }
 
 #loading_screen.hidden {
-    opacity: 0;
-    visibility: hidden;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
-/* NEW DOT ANIMATION STYLES */
 .loader {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
 .loader span {
-    height: 25px;
-    width: 25px;
-    margin-right: 10px;
-    border-radius: 50%;
-    background-color: #00FF00; /* Set to your highlight color */
-    animation: loading 1s linear infinite;
+    height: 25px;
+    width: 25px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #00FF00;
+    animation: loading 1.5s linear infinite;
 }
 
 /* Delay for the wave effect */
@@ -103,261 +102,285 @@ button {
 /* ------------------------------------- */
 
 h2 {
-    text-align: center;
-    color: #00FF00;
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
-    margin-top: 0;
+    text-align: center;
+    color: #00FF00;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+    margin-top: 0;
 }
 
-div {
-    padding: 0;
-}
 
 /* ------------------------------------- */
 /* --- LOGIN/INPUT STYLES --- */
 /* ------------------------------------- */
 
 .login_field {
-    display: block; 
-    width: 100%; 
-    margin-bottom: 15px; 
-    padding: 12px 15px; 
-    border: 1px solid #444; 
-    border-radius: 8px; 
-    font-size: 1rem;
-    box-sizing: border-box; 
-    background-color: white; 
-    color: black; 
+    display: block; 
+    width: 100%; 
+    margin-bottom: 15px; 
+    padding: 12px 15px; 
+    border: 1px solid #444; 
+    border-radius: 8px; 
+    font-size: 1rem;
+    box-sizing: border-box; 
+    background-color: white; 
+    color: black; 
 }
 
-#login_btn { 
-    background-color: lightgray; 
-    color: black; 
-    font-weight: 700;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
+#login_btn { 
+    background-color: lightgray; 
+    color: black; 
+    font-weight: 700;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
-#login_btn:hover { 
-    background-color: #00CC00; 
-    transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+#login_btn:hover { 
+    background-color: #00CC00; 
+    transform: scale(1.02);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
 }
 
 
 /* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES (BLACK) --- */
+/* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
 .overlay {
-    position: absolute; 
-    border-radius: 1rem;
-    padding: 1.5rem;
-    width: 45%; 
-    background-color: rgba(0, 0, 0, 0.9); /* BLACK PANELS */
-    max-height: 90vh; 
-    z-index: 10;
-    
-    opacity: 0; 
-    visibility: hidden; 
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
+    position: absolute;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    width: 45%; 
+    background-color: rgba(0, 0, 0, 0.9);
+    max-height: 80vh;
+    z-index: 10;
+    
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
 }
 
 .overlay.visible {
-    opacity: 1; 
-    visibility: visible;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear;
+    opacity: 1; 
+    visibility: visible;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear;
 }
 
-/* Position side-by-side */
+/* Homework panel positioning and animation */
 #hw_panel {
-    left: 1%; 
-    top: 100px;
-    transform: translateX(-20px);
+    left: 1%; 
+    top: 180px;
+    transform: translateX(-100%);
 }
 
 #hw_panel.visible {
-    transform: translateX(0);
+    transform: translateX(0);
 }
 
+/* Log panel positioning and animation */
 #log_panel {
-    right: 1%;
-    top: 100px;
-    transform: translateX(20px);
+    right: 1%;
+    top: 180px;
+    transform: translateX(100%);
 }
 
 #log_panel.visible {
-    transform: translateX(0);
+    transform: translateX(0);
 }
 
 
-/* Login panel centering (ALSO BLACK) */
+/* Login panel centering and styling */
 #login {
-    background-color: rgba(0, 0, 0, 0.95);
-    border: 2px solid #00FF00;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%; 
-    max-width: 400px;
-    height: auto;
-    opacity: 0;
-    transition: opacity 0.5s ease-out;
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid #00FF00;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; 
+    max-width: 400px;
+    height: auto;
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
 }
 
 #login.visible {
-    opacity: 1;
+    opacity: 1;
 }
 
 
 /* ------------------------------------- */
-/* --- HOMEWORK / LOG LIST STYLES (300px height) --- */
+/* --- HOMEWORK / LOG LIST STYLES --- */
 /* ------------------------------------- */
 
 .overflow_container {
-    overflow-y: scroll;
-    padding: 0.5rem; 
-    border: 1px solid #00FF00; 
-    border-radius: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.3);
-    margin-top: 0.5rem;
-    max-height: 300px; 
+    overflow-y: auto;
+    padding: 0.5rem; 
+    border: 1px solid #00FF00; 
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin-top: 0.5rem;
+    max-height: 300px; 
 }
-
-#log_container {
-    max-height: 300px; 
-}
-
-#hw_container {
-    max-height: 300px; 
-}
-
 
 .json_small {
-    font-family: "Space Mono", serif;
-    font-size: 0.75rem;
-    word-break: break-all;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 0.5rem;
-    border-left: 3px solid white;
-    margin: 0.5rem 0;
+    font-family: "Space Mono", serif;
+    font-size: 0.75rem;
+    word-break: break-all;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem;
+    border-left: 3px solid white;
+    margin: 0.5rem 0;
 }
 
+.log-entry {
+    display: block;
+    margin: 5px 0;
+    padding: 5px; 
+    border-left: 3px solid #00FF00;
+    font-size: 0.9rem;
+    cursor: pointer; 
+    background-color: rgba(0, 0, 0, 0.4); 
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    line-height: 1.5;
+}
+
+.log-entry:hover {
+    background-color: rgba(0, 50, 0, 0.7); 
+}
+
+.log-entry.expanded .json_small {
+    display: block;
+}
+
+.log-entry.expanded {
+    border-left: 3px solid #FFFF00;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.task {
+    display: block;
+    padding: 0.2rem 0;
+}
 
 /* ------------------------------------- */
 /* --- BUTTONS & PROGRESS BAR ANIMATIONS --- */
 /* ------------------------------------- */
 
 .settings_button {
-    position: fixed; 
-    top: 10px;
-    right: 10px;
-    padding: 0.75rem;
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    border: 2px solid #00FF00;
-    border-radius: 8px;
-    font-weight: 700;
-    z-index: 30;
-    text-shadow: 0 0 5px black;
-    animation: pulsate 1.5s infinite alternate; 
-    transition: background-color 0.2s ease-in-out;
+    position: fixed; 
+    top: 10px;
+    padding: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    border: 2px solid #00FF00;
+    border-radius: 8px;
+    font-weight: 700;
+    z-index: 30;
+    text-shadow: 0 0 5px black;
+    animation: pulsate 1.5s infinite alternate; 
+    transition: background-color 0.2s ease-in-out;
+}
+
+#settings_button { right: 10px; }
+#logout_button { right: 120px; }
+
+.animated-button {
+    transition: 
+        box-shadow 0.3s ease-out, 
+        transform 0.2s ease-out,
+        background-color 0.2s ease-in-out;
 }
 
 #do_hw {
-    background-color: #00FF00;
-    color: black;
-    font-weight: 900;
-    border: 3px solid #00CC00;
-    border-radius: 8px;
-    padding: 10px 20px;
-    display: block; 
-    width: 100%;
-    box-sizing: border-box;
-    margin: 2rem 0 0 0; 
-    transition: background-color 0.2s, transform 0.2s;
+    background-color: #00FF00;
+    color: black;
+    font-weight: 900;
+    border: 3px solid #00CC00;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block; 
+    width: 100%;
+    box-sizing: border-box;
+    margin: 2rem 0 0 0; 
+    transition: background-color 0.2s, transform 0.2s;
 }
 
 #do_hw:hover {
-    background-color: #00CC00;
-    transform: translateY(-2px);
+    background-color: #00CC00;
+    transform: translateY(-2px);
 }
 
-/* Base style for the Progress Bar containers */
 .progress_bar_container {
-    height: 1rem;
-    background-color: #333333; 
-    border-radius: 5px;
-    overflow: hidden;
-    margin: 10px 0; 
+    height: 1rem;
+    background-color: #333333; 
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 10px 0; 
 }
 
-/* Applies to both #hw_bar and the new #log_bar */
-.progress_bar { 
-    padding: 0;
-    width: 0%;
-    height: 100%;
-    background-color: #00ff00;
-    transition: width 0.6s ease-out; 
-    box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); 
+.progress_bar { 
+    padding: 0;
+    width: 0%;
+    height: 100%;
+    background-color: #00ff00;
+    transition: width 0.6s ease-out; 
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); 
 }
 
-/* Other miscellaneous styles */
-.task {
-    display: block;
-    padding: 0.2rem 0;
-}
+/* ------------------------------------- */
+/* --- DIALOG / SETTINGS STYLES --- */
+/* ------------------------------------- */
 
 dialog#settings {
-    background-color: rgba(0, 0, 0, 0.95);
-    border: 2px solid #00FF00;
-    border-radius: 1rem;
-    padding: 2rem;
-    color: white;
-    font-family: inherit;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    max-width: 500px;
-    width: 90%;
-    z-index: 40;
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid #00FF00;
+    border-radius: 1rem;
+    padding: 2rem;
+    color: white;
+    font-family: inherit;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+    max-width: 500px;
+    width: 90%;
+    z-index: 40;
 }
 
 dialog#settings::backdrop {
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 8px;
-    background: #333;
-    border-radius: 5px;
-    margin: 10px 0;
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    background: #333;
+    border-radius: 5px;
+    margin: 10px 0;
 }
 
 input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #00FF00;
-    cursor: pointer;
-    border-radius: 50%;
-    border: 2px solid black;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #00FF00;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid black;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
 }
 
 input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: #00FF00;
-    cursor: pointer;
-    border-radius: 50%;
-    border: 2px solid black;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+    width: 20px;
+    height: 20px;
+    background: #00FF00;
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid black;
+    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
 }
 
 .hideable {
-    display: none;
+    display: none;
 }
