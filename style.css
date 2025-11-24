@@ -3,15 +3,15 @@
 
 /* --- GLOBAL BODY & FONT --- */
 body {
-    display: block; 
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
     font-size: 1.05rem;
     background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
-    background-size: cover;
-    background-attachment: fixed; /* Keep background static */
-    min-height: 120vh; 
+    /* FIX: Set cover size and min-height for scrollability */
+    background-size: cover; 
+    background-attachment: fixed;
+    min-height: 120vh; /* Ensures vertical scrolling is possible */
     color: white; 
     margin: 0; 
     padding: 0;
@@ -23,7 +23,7 @@ button {
 }
 
 /* ------------------------------------- */
-/* --- GENERAL STYLES --- */
+/* --- GENERAL STYLES & HEADINGS --- */
 /* ------------------------------------- */
 
 h2 {
@@ -34,7 +34,8 @@ h2 {
 }
 
 div {
-    padding: 0; 
+    /* FIX: Set padding back to 0 for containers to prevent double padding issues */
+    padding: 0;
 }
 
 /* ------------------------------------- */
@@ -43,7 +44,7 @@ div {
 
 .login_field {
     display: block; 
-    width: 100%; 
+    width: 100%; /* Added: Ensure fields take full width in login box */
     margin-bottom: 15px; 
     padding: 12px 15px; 
     border: 1px solid #444; 
@@ -52,13 +53,6 @@ div {
     box-sizing: border-box; 
     background-color: white; 
     color: black; 
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.login_field:focus {
-    outline: none;
-    border-color: #00FF00; 
-    box-shadow: 0 0 0 3px rgba(0, 255, 0, 0.2); 
 }
 
 #login_btn { 
@@ -81,22 +75,38 @@ div {
 /* ------------------------------------- */
 
 .overlay {
-    display: none; 
-    position: absolute; 
+    position: absolute; /* Changed from fixed to absolute for scrolling */
+    border-radius: 1rem;
+    padding: 1.5rem; /* Added: Padding inside the panel */
+    width: 45%; 
+    background-color: rgba(145, 0, 145, 0.8); /* Used your purple/pink theme */
+    visibility: hidden;
+    /* Removed fixed height, using max-height on specific panels/containers */
+    max-height: 90vh; 
     z-index: 10;
-    padding: 1.5rem; 
 }
 
+/* Displays the panels when JS sets the class */
 .overlay.visible {
-    display: block;
+    visibility: visible; 
 }
 
-/* Login panel remains centered */
+
+/* Specific positioning for the side panels */
+#hw_panel {
+    left: 1%; 
+    top: 100px; /* Positioned down from the top of the document */
+}
+
+#log_panel {
+    right: 1%;
+    top: 100px;
+}
+
+/* Positioning for the login panel (should always be centered, even if absolute) */
 #login {
     background-color: rgba(145, 0, 145, 0.9); 
-    border: 2px solid #00FF00; 
-    border-radius: 1rem;
-    position: absolute; 
+    border: 2px solid #00FF00;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
@@ -105,35 +115,58 @@ div {
     height: auto;
 }
 
-/* Homework and Logs panels are positioned relative to the document top, not centered */
-#hw_panel, #log_panel {
-    background-color: rgba(145, 0, 145, 0.8); 
-    border: 2px solid #00FF00; 
-    border-radius: 1rem;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    color: white; 
+
+/* ------------------------------------- */
+/* --- HOMEWORK / LOG LIST STYLES --- */
+/* ------------------------------------- */
+
+/* This manages the scrollable area height */
+.overflow_container {
+    overflow-y: scroll;
+    padding: 0.5rem; /* Added: Inner padding */
+    border: 1px solid #00FF00; /* Added: Neon border */
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin-top: 0.5rem;
     
-    position: absolute; 
-    width: 45%; 
-    max-height: 90vh; 
-    top: 100px; 
+    /* FIX: Using a high viewport height relative to the panel to ensure scrollability */
+    max-height: 65vh; 
 }
 
-/* Positioning the Homeworks Panel on the Left */
-#hw_panel {
-    left: 1%; 
-    right: auto;
+/* Explicitly target the Logs container for clarity, though it uses the generic class */
+#log_container {
+    max-height: 65vh; 
 }
 
-/* Positioning the Logs Panel on the Right */
-#log_panel {
-    right: 1%;
-    left: auto;
+
+.json_small {
+    font-family: "Space Mono", serif;
+    font-size: 0.75rem;
+    word-break: break-all;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 0.5rem;
+    border-left: 3px solid white;
+    margin: 0.5rem 0;
 }
+
 
 /* ------------------------------------- */
-/* --- HOMEWORK BUTTON --- */
+/* --- BUTTONS & PROGRESS BAR --- */
 /* ------------------------------------- */
+
+.settings_button {
+    position: fixed; /* Kept fixed so it stays in the corner while scrolling */
+    top: 10px;
+    right: 10px;
+    padding: 0.75rem;
+    background-color: rgba(145, 0, 145, 0.8);
+    color: white;
+    border: 2px solid #00FF00;
+    border-radius: 8px;
+    font-weight: 700;
+    z-index: 30;
+    text-shadow: 0 0 5px black;
+}
 
 #do_hw {
     background-color: #00FF00;
@@ -153,50 +186,6 @@ div {
     background-color: #00CC00;
 }
 
-/* ------------------------------------- */
-/* --- HOMEWORK / LOG LIST STYLES --- */
-/* ------------------------------------- */
-
-/* This sets the maximum height for the homework list */
-#hw_container {
-    max-height: 65vh; 
-}
-
-/* FIX: Added max-height to log_container to make it match the homework panel height */
-#log_container {
-    max-height: 65vh; 
-}
-
-
-/* Styling for all scrollable containers (Homework list and Logs) */
-.overflow_container {
-    overflow-y: scroll;
-    padding: 0.5rem; 
-    border: 1px solid #00FF00; 
-    border-radius: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.3);
-    margin-top: 0.5rem;
-}
-
-.task {
-    display: block;
-    padding: 0.2rem 0;
-}
-
-.json_small {
-    font-family: "Space Mono", monospace;
-    font-size: 0.75rem;
-    word-break: break-all;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 0.5rem;
-    border-left: 3px solid white;
-    margin: 0.5rem 0;
-}
-
-/* ------------------------------------- */
-/* --- PROGRESS BAR STYLES --- */
-/* ------------------------------------- */
-
 #hw_bar { 
     height: 1rem;
     background-color: #333333; 
@@ -206,30 +195,18 @@ div {
 }
 
 .progress_bar { 
+    /* Inherited from template, but fixed position */
+    padding: 0;
     width: 0%;
     height: 100%;
     background-color: #00ff00;
     transition: width 0.3s ease;
 }
 
-
-/* ------------------------------------- */
-/* --- SETTINGS & MISC STYLES --- */
-/* ------------------------------------- */
-
-/* Settings button remains fixed so it's always accessible */
-.settings_button {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 0.75rem;
-    background-color: rgba(145, 0, 145, 0.8);
-    color: white;
-    border: 2px solid #00FF00;
-    border-radius: 8px;
-    font-weight: 700;
-    z-index: 30;
-    text-shadow: 0 0 5px black;
+/* Other miscellaneous styles (e.g., dialog, range slider, task) */
+.task {
+    display: block;
+    padding: 0.2rem 0;
 }
 
 dialog#settings {
@@ -249,7 +226,6 @@ dialog#settings::backdrop {
     background-color: rgba(0, 0, 0, 0.7);
 }
 
-/* Style the range slider for the speed setting */
 input[type="range"] {
     -webkit-appearance: none;
     width: 100%;
@@ -279,4 +255,9 @@ input[type="range"]::-moz-range-thumb {
     border-radius: 50%;
     border: 2px solid black;
     box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
+}
+
+/* Your original template included a .hideable class, though 'visibility: hidden' on .overlay is used instead. */
+.hideable {
+    display: none;
 }
