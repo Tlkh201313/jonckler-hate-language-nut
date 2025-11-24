@@ -4,69 +4,58 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="style.css"> 
-        <title>**Jonckler Client**</title>
+        <title>Jonckler Client</title>
     </head>
 
     <body>
-                <div id="loading_screen">
-            <div class="loader">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-            Loading **Jonckler Client**...
-        </div>
-        
-        <img src="./languagenut.jpeg" width='30%'>
+                
+        <div id="main-content" class="hidden-initially">
+            <img src="./languagenut.jpeg" width='30%'>
 
-                <div id="login" class="overlay"> 
-            <input class="login_field" id="username_input" type="text" placeholder="Username">
-            <input class="login_field" id="password_input" type="password" placeholder="Password">
+            <div id="login" class="overlay"> 
+                <input class="login_field" id="username_input" type="text" placeholder="Username">
+                <input class="login_field" id="password_input" type="password" placeholder="Password">
+                
+                <button class="login_field animated-button" id="login_btn"> Log In </button>
+            </div>
+
+            <div id="hw_panel" class="overlay">
+                <h2>Homeworks</h2>
+                <input type="checkbox" id="selectall">
+                <label for="selectall">select all</label>
+
+                <div class="progress_bar_container">
+                    <div id="hw_bar" class="progress_bar"></div>
+                </div> 
+
+                <div id="hw_container" class="overflow_container">
+                </div>
+                
+                <button id="do_hw" class="animated-button" style="margin: 2rem;">START SELECTED HOMEWORK</button>
+            </div>
+
+
+            <div id="log_panel" class="overlay">
+                <h2>Logs</h2>
+                <div class="progress_bar_container">
+                    <div id="log_bar" class="progress_bar"></div>
+                </div>
+                <div id="log_container" class="overflow_container">
+                </div>
+            </div>
+
+
+            <dialog id="settings">
+                [Esc] to exit
+                <br>
+                Select the time you want your homework to appear to be done in:
+                <input type="range" min="0" max="4" value="2" id="speed_slider" step="0.1"> 
+                <br/>
+                Current speed: <span id="speed_display"></span> 
+            </dialog>
             
-            <button class="login_field animated-button" id="login_btn"> Log In </button>
-        </div>
-
-                <div id="hw_panel" class="overlay">
-            <h2>Homeworks</h2>
-            <input type="checkbox" id="selectall">
-            <label for="selectall">select all</label>
-
-            <div class="progress_bar_container">
-                <div id="hw_bar" class="progress_bar"></div>
-            </div> 
-
-            <div id="hw_container" class="overflow_container">
-            </div>
-            
-            <button id="do_hw" class="animated-button" style="margin: 2rem;">START SELECTED HOMEWORK</button>
-        </div>
-
-
-                <div id="log_panel" class="overlay">
-            <h2>Logs</h2>
-            <div class="progress_bar_container">
-                <div id="log_bar" class="progress_bar"></div>
-            </div>
-            <div id="log_container" class="overflow_container">
-            </div>
-        </div>
-
-
-        <dialog id="settings">
-            [Esc] to exit
-            <br>
-            Select the time you want your homework to appear to be done in:
-            <input type="range" min="0" max="4" value="2" id="speed_slider" step="0.1"> 
-            <br/>
-            Current speed: <span id="speed_display"></span> 
-        </dialog>
-        
-                <button id="settings_button" class="settings_button animated-button">Settings</button>
-        <button id="logout_button" class="settings_button animated-button" style="right: 120px;">Log Out</button>
-
-        <script src="index.js"></script>
+            <button id="settings_button" class="settings_button animated-button">Settings</button>
+            <button id="logout_button" class="settings_button animated-button" style="right: 120px;">Log Out</button>
+        </div>         <script src="index.js"></script>
     </body>
 </html>
