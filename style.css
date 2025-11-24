@@ -53,6 +53,7 @@ button {
     align-items: center;
     color: #00FF00;
     font-size: 1.5rem;
+    /* Transition for fading out */
     transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
 }
 
@@ -121,7 +122,7 @@ div {
 
 
 /* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES (NOW BLACK!) --- */
+/* --- OVERLAY / PANEL BASE STYLES (BLACK) --- */
 /* ------------------------------------- */
 
 .overlay {
@@ -129,8 +130,7 @@ div {
     border-radius: 1rem;
     padding: 1.5rem;
     width: 45%; 
-    /* CHANGED FROM PURPLE TO BLACK */
-    background-color: rgba(0, 0, 0, 0.9); 
+    background-color: rgba(0, 0, 0, 0.9); /* BLACK PANELS */
     max-height: 90vh; 
     z-index: 10;
     
@@ -169,7 +169,7 @@ div {
 
 /* Login panel centering (ALSO BLACK) */
 #login {
-    background-color: rgba(0, 0, 0, 0.95); /* Deeper black for login */
+    background-color: rgba(0, 0, 0, 0.95);
     border: 2px solid #00FF00;
     left: 50%;
     top: 50%;
@@ -229,7 +229,7 @@ div {
     top: 10px;
     right: 10px;
     padding: 0.75rem;
-    background-color: rgba(0, 0, 0, 0.8); /* Changed to black */
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     border: 2px solid #00FF00;
     border-radius: 8px;
