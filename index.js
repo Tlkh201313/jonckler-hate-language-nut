@@ -207,7 +207,7 @@ class task_completer {
     }
 }
 
-// --- Function to toggle panels (Now just for login/HW/logs visibility) ---
+// --- Function to toggle panels (Only references 'login', 'hw_panel', 'log_panel') ---
 function showPanel(panelId) {
     const panels = ['login', 'hw_panel', 'log_panel'];
     
@@ -327,7 +327,7 @@ class client_application {
         // Hide login panel
         showPanel(''); 
         
-        // Show BOTH HW and Logs panels
+        // Show all main panels
         document.getElementById('hw_panel').classList.add('visible');
         document.getElementById('log_panel').classList.add('visible');
         
