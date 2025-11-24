@@ -139,7 +139,7 @@ h2 {
 
 #login_btn:hover { 
     background-color: #00CC00; 
-    **transform: scale(1.02);** /* FIXED: Scales up in place */
+    transform: scale(1.02); /* SCALING FIX */
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
 }
 
@@ -310,7 +310,7 @@ h2 {
 
 #do_hw:hover {
     background-color: #00CC00;
-    **transform: scale(1.01);** /* FIXED: Scales up in place */
+    **transform: scale(1.01);** /* SCALING FIX */
 }
 
 .progress_bar_container {
