@@ -13,7 +13,7 @@ body {
     background-repeat: no-repeat;
     background-size: cover; 
     background-attachment: fixed;
-    min-height: 100vh; /* Set to 100vh for predictable fixed panel positioning */
+    min-height: 100vh;
     color: white; 
     margin: 0; 
     padding: 0;
@@ -46,6 +46,15 @@ img[src*="languagenut"] {
     75%{ transform: translateX(15px); }
     100%{ transform: translateX(0); }
 }
+
+/* Delay for the wave effect */
+.loader span:nth-child(1) { animation-delay: 0.1s; }
+.loader span:nth-child(2) { animation-delay: 0.2s; }
+.loader span:nth-child(3) { animation-delay: 0.3s; }
+.loader span:nth-child(4) { animation-delay: 0.4s; }
+.loader span:nth-child(5) { animation-delay: 0.5s; }
+.loader span:nth-child(6) { animation-delay: 0.6s; }
+
 
 /* ------------------------------------- */
 /* --- LOADING SCREEN STYLES --- */
@@ -89,14 +98,6 @@ img[src*="languagenut"] {
     animation: loading 1.5s linear infinite;
 }
 
-/* Delay for the wave effect */
-.loader span:nth-child(1) { animation-delay: 0.1s; }
-.loader span:nth-child(2) { animation-delay: 0.2s; }
-.loader span:nth-child(3) { animation-delay: 0.3s; }
-.loader span:nth-child(4) { animation-delay: 0.4s; }
-.loader span:nth-child(5) { animation-delay: 0.5s; }
-.loader span:nth-child(6) { animation-delay: 0.6s; }
-
 
 /* ------------------------------------- */
 /* --- GENERAL STYLES & HEADINGS --- */
@@ -107,6 +108,14 @@ h2 {
     color: #00FF00;
     text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
     margin-top: 0;
+}
+
+h4 {
+    color: #00FF00 !important; /* Force green for module headers */
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    padding-bottom: 5px;
+    margin-bottom: 5px;
+    margin-top: 15px !important;
 }
 
 
@@ -125,18 +134,6 @@ h2 {
     box-sizing: border-box; 
     background-color: white; 
     color: black; 
-}
-
-/* Style for the new Remember Me checkbox container */
-#remember_me_container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-#remember_me_container label {
-    margin-left: 8px;
-    font-size: 0.9rem;
 }
 
 #login_btn { 
@@ -165,10 +162,11 @@ h2 {
     border-radius: 1rem;
     padding: 1.5rem;
     width: 45%; 
-    background-color: rgba(0, 0, 0, 0.9);
+    **background-color: rgba(0, 0, 0, 0.9);** /* Set to a dark, non-purple background */
     max-height: 80vh;
     z-index: 10;
-    
+    border: 1px solid #00FF00; /* Add border for definition */
+    
     opacity: 0; 
     visibility: hidden; 
     transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
@@ -276,6 +274,7 @@ h2 {
     display: block;
     padding: 0.2rem 0;
 }
+
 
 /* ------------------------------------- */
 /* --- BUTTONS & PROGRESS BAR ANIMATIONS --- */
