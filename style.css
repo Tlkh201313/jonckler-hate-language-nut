@@ -39,6 +39,52 @@ div {
 }
 
 /* ------------------------------------- */
+/* --- NAVIGATION SIDEBAR FIX --- */
+/* ------------------------------------- */
+
+.sidebar {
+    position: fixed;
+    top: 50%; /* Center vertically */
+    transform: translateY(-50%);
+    left: 10px;
+    width: 150px;
+    height: auto;
+    background-color: rgba(145, 0, 145, 0.95); /* Purple background */
+    border: 2px solid #00FF00; 
+    border-radius: 1rem;
+    padding: 10px;
+    z-index: 30;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav-item {
+    margin-bottom: 10px;
+}
+
+.nav-item a {
+    display: block;
+    color: #00FF00; /* Neon Green Text */
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
+    text-align: center;
+    text-decoration: none;
+    padding: 10px 5px;
+    background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent button background */
+    border: 1px solid #00FF00;
+    border-radius: 5px;
+    transition: background-color 0.2s;
+}
+
+.nav-item a:hover {
+    background-color: rgba(0, 255, 0, 0.2); /* Light green hover effect */
+    color: white;
+}
+
+/* ------------------------------------- */
 /* --- LOGIN/INPUT STYLES --- */
 /* ------------------------------------- */
 
@@ -117,18 +163,18 @@ div {
     box-shadow: 0 5px 15px rgba(0,0,0,0.8);
     color: white; 
     
-    /* Fixed Positioning and Dimensions (The "box scale" you wanted) */
+    /* Fixed Positioning and Dimensions */
     position: fixed;
-    width: 45%; 
+    width: 40%; /* Adjusted width to make room for the new sidebar */
     max-height: 90vh; 
     top: 50%;
     transform: translateY(-50%); 
     z-index: 20;
 }
 
-/* Positioning the Homeworks Panel on the Left */
+/* Positioning the Homeworks Panel on the Left (Pushed right to clear sidebar) */
 #hw_panel {
-    left: 20px;
+    left: 180px; /* Shifted from 20px to 180px to clear the 150px sidebar */
     right: auto;
 }
 
