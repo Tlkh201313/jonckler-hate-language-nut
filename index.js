@@ -294,18 +294,36 @@ class client_application {
         const json = await response.json();
         return json;
     }
+    
+    // Checks localStorage for a previously saved token
+    check_for_saved_session() {
+        const savedToken = localStorage.getItem('lnut_token');
+        if (savedToken) {
+            this.token = savedToken;
+            return true;
+        }
+        return false;
+    }
 
-    // --- MAIN FUNCTION MODIFIED FOR LOADING SCREEN ---
+    // --- MAIN FUNCTION MODIFIED FOR LOADING SCREEN AND PERSISTENCE ---
     main() {
         const loadingScreen = document.getElementById('loading_screen');
+        const hasSession = this.check_for_saved_session();
 
-        // This ensures the loading screen shows for at least 1.5 seconds every time the page loads.
+        // Delay the transition so the user sees the loading screen animation
         setTimeout(() => {
             // 1. Hide the loading screen
             loadingScreen.classList.add('hidden'); 
             
-            // 2. Show the login panel after the loading screen is gone
-            showPanel('login'); 
+            // 2. Decide where to go after loading
+            if (hasSession) {
+                // Skip login, go straight to panels
+                console.log("Session found. Logging in automatically.");
+                this.on_log_in();
+            } else {
+                // Show the login panel
+                showPanel('login'); 
+            }
             
         }, 1500); // 1.5 seconds delay
 
@@ -326,7 +344,11 @@ class client_application {
             
             this.token = response.newToken;
             if (this.token !== undefined) {
-                this.logLoginAttempt(username, "Standard (API)"); 
+                this.logLoginAttempt(username, "Standard (API)");
+                
+                // Save the token for next time
+                localStorage.setItem('lnut_token', this.token);
+                
                 this.on_log_in();
             } else {
                 console.log("Login failed for user:", username);
