@@ -57,49 +57,6 @@ img[src*="languagenut"] {
 
 
 /* ------------------------------------- */
-/* --- LOADING SCREEN STYLES --- */
-/* ------------------------------------- */
-
-#loading_screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #00FF00;
-    font-size: 1.5rem;
-    transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
-}
-
-#loading_screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.loader {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.loader span {
-    height: 25px;
-    width: 25px;
-    margin-right: 10px;
-    border-radius: 50%;
-    background-color: #00FF00;
-    animation: loading 1.5s linear infinite;
-}
-
-
-/* ------------------------------------- */
 /* --- GENERAL STYLES & HEADINGS --- */
 /* ------------------------------------- */
 
@@ -111,7 +68,7 @@ h2 {
 }
 
 h4 {
-    color: #00FF00 !important; /* Force green for module headers */
+    color: #00FF00 !important; 
     border-bottom: 1px solid rgba(0, 255, 0, 0.3);
     padding-bottom: 5px;
     margin-bottom: 5px;
@@ -162,10 +119,10 @@ h4 {
     border-radius: 1rem;
     padding: 1.5rem;
     width: 45%; 
-    **background-color: rgba(0, 0, 0, 0.9);** /* Set to a dark, non-purple background */
+    background-color: rgba(0, 0, 0, 0.9); 
     max-height: 80vh;
     z-index: 10;
-    border: 1px solid #00FF00; /* Add border for definition */
+    border: 1px solid #00FF00; 
     
     opacity: 0; 
     visibility: hidden; 
@@ -275,7 +232,6 @@ h4 {
     padding: 0.2rem 0;
 }
 
-
 /* ------------------------------------- */
 /* --- BUTTONS & PROGRESS BAR ANIMATIONS --- */
 /* ------------------------------------- */
@@ -311,11 +267,11 @@ h4 {
     font-weight: 900;
     border: 3px solid #00CC00;
     border-radius: 8px;
-    padding: 8px 15px; /* Smaller button padding */
+    **padding: 8px 15px;** /* Keeping the smaller button padding */
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    margin: 1rem 0 0 0; /* Smaller button margin */
+    **margin: 1rem 0 0 0;** /* Keeping the smaller button margin */
     transition: background-color 0.2s, transform 0.2s;
 }
 
