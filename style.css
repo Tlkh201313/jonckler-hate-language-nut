@@ -122,17 +122,15 @@ div {
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
-    
-    /* FIX: Significantly reduced height for smaller selection area */
-    max-height: 100px; 
+    max-height: 300px; 
 }
 
 #log_container {
-    max-height: 100px; 
+    max-height: 300px; 
 }
 
 #hw_container {
-    max-height: 100px; 
+    max-height: 300px; 
 }
 
 
@@ -175,6 +173,7 @@ div {
     display: block; 
     width: 100%;
     box-sizing: border-box;
+    /* FIX: Set 2rem margin via CSS */
     margin: 2rem 0 0 0; 
     transition: background-color 0.2s;
 }
@@ -192,7 +191,7 @@ div {
     margin: 10px 0; 
 }
 
-/* Applies to both #hw_bar and the new #log_bar */
+/* FIX: Applies to both #hw_bar and the new #log_bar */
 .progress_bar { 
     padding: 0;
     width: 0%;
