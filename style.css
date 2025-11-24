@@ -164,6 +164,7 @@ h4 {
     width: 45%; 
     background-color: rgba(0, 0, 0, 0.9); 
     max-height: 80vh;
+    height: 600px; /* NEW: Explicit height for better child component sizing */
     z-index: 10;
     border: 1px solid #00FF00; 
     
@@ -231,7 +232,9 @@ h4 {
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
-    max-height: 300px; 
+    /* NEW: Calculate height based on parent height (600px) minus padding and fixed elements above/below */
+    max-height: 380px; 
+    /* The calculation is roughly: 600px (panel height) - 48px (padding top/bottom) - 30px (h2) - 30px (checkbox) - 20px (progress bar) - 60px (button + margin) = 412px. Using 380px for safety margin. */
 }
 
 .json_small {
@@ -261,8 +264,12 @@ h4 {
     background-color: rgba(0, 50, 0, 0.7); 
 }
 
+.log-entry .json_small {
+    display: none; /* Hide JSON by default */
+}
+
 .log-entry.expanded .json_small {
-    display: block;
+    display: block; /* Show JSON when expanded */
 }
 
 .log-entry.expanded {
@@ -310,11 +317,11 @@ h4 {
     font-weight: 900;
     border: 3px solid #00CC00;
     border-radius: 8px;
-    padding: 8px 15px; /* Fixed: Smaller padding */
+    padding: 8px 15px; 
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    margin: 1rem 0 0 0; /* Fixed: Smaller top margin */
+    margin: 1rem 0 0 0; /* Confirmed smallest viable margin */
     transition: background-color 0.2s, transform 0.2s;
 }
 
