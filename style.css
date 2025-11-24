@@ -98,6 +98,17 @@ div {
     top: 100px;
 }
 
+/* --- NEW PANEL POSITION --- */
+#bottom_right_panel {
+    right: 1%;
+    /* Pushes the panel below the Log Panel */
+    top: 500px; 
+    height: auto;
+    width: 45%;
+}
+/* -------------------------- */
+
+
 /* Login panel centering */
 #login {
     background-color: rgba(145, 0, 145, 0.9); 
@@ -173,7 +184,6 @@ div {
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    /* FIX: Set 2rem margin via CSS */
     margin: 2rem 0 0 0; 
     transition: background-color 0.2s;
 }
@@ -191,7 +201,7 @@ div {
     margin: 10px 0; 
 }
 
-/* FIX: Applies to both #hw_bar and the new #log_bar */
+/* Applies to both #hw_bar and the new #log_bar */
 .progress_bar { 
     padding: 0;
     width: 0%;
