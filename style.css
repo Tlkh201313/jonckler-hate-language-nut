@@ -9,11 +9,11 @@ body {
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
     font-size: 1.05rem;
-    background-image: url("./hellfire.gif"); /* Jonckler theme background */
+    background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
     background-size: cover; 
     background-attachment: fixed;
-    min-height: 100vh; /* Set to 100vh for predictable fixed panel positioning */
+    min-height: 100vh; 
     color: white; 
     margin: 0; 
     padding: 0;
@@ -24,7 +24,6 @@ button {
     cursor: pointer;
 }
 
-/* Ensure the logo is properly placed */
 img[src*="languagenut"] {
     display: block;
     margin: 50px auto 20px auto;
@@ -139,7 +138,7 @@ h2 {
 
 #login_btn:hover { 
     background-color: #00CC00; 
-    **transform: scale(1.02);** /* FIXED: Scales up in place */
+    transform: scale(1.02);
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
 }
 
@@ -310,7 +309,7 @@ h2 {
 
 #do_hw:hover {
     background-color: #00CC00;
-    **transform: scale(1.01);** /* FIXED: Scales up in place */
+    transform: translateY(-2px);
 }
 
 .progress_bar_container {
