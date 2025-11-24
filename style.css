@@ -9,11 +9,11 @@ body {
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
     font-size: 1.05rem;
-    background-image: url("./hellfire.gif");
+    background-image: url("./hellfire.gif"); /* Jonckler theme background */
     background-repeat: no-repeat;
     background-size: cover; 
     background-attachment: fixed;
-    min-height: 100vh; 
+    min-height: 100vh; /* Set to 100vh for predictable fixed panel positioning */
     color: white; 
     margin: 0; 
     padding: 0;
@@ -24,6 +24,7 @@ button {
     cursor: pointer;
 }
 
+/* Ensure the logo is properly placed */
 img[src*="languagenut"] {
     display: block;
     margin: 50px auto 20px auto;
@@ -126,6 +127,18 @@ h2 {
     color: black; 
 }
 
+/* Style for the new Remember Me checkbox container */
+#remember_me_container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+#remember_me_container label {
+    margin-left: 8px;
+    font-size: 0.9rem;
+}
+
 #login_btn { 
     background-color: lightgray; 
     color: black; 
@@ -138,7 +151,7 @@ h2 {
 
 #login_btn:hover { 
     background-color: #00CC00; 
-    transform: scale(1.02);
+    transform: scale(1.02); 
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
 }
 
@@ -299,17 +312,17 @@ h2 {
     font-weight: 900;
     border: 3px solid #00CC00;
     border-radius: 8px;
-    padding: 10px 20px;
+    padding: 8px 15px; /* Smaller button padding */
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    margin: 2rem 0 0 0; 
+    margin: 1rem 0 0 0; /* Smaller button margin */
     transition: background-color 0.2s, transform 0.2s;
 }
 
 #do_hw:hover {
     background-color: #00CC00;
-    transform: translateY(-2px);
+    transform: scale(1.01); 
 }
 
 .progress_bar_container {
