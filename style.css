@@ -60,44 +60,63 @@ div {
     border: none;
     padding: 12px 20px;
     border-radius: 8px;
-    transition: background-color 0.2s ease-in-out;
+    /* ADDED TRANSITIONS FOR HOVER EFFECT */
+    transition: background-color 0.2s ease-in-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
 
 #login_btn:hover { 
     background-color: #00CC00; 
+    transform: scale(1.02); /* Slight scale on hover */
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5); /* Green glow */
 }
 
 
 /* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES --- */
+/* --- OVERLAY / PANEL BASE STYLES & ANIMATION --- */
 /* ------------------------------------- */
 
 .overlay {
     position: absolute; 
     border-radius: 1rem;
     padding: 1.5rem;
-    /* Use percentage for width to allow scaling */
     width: 45%; 
     background-color: rgba(145, 0, 145, 0.8); 
-    visibility: hidden;
     max-height: 90vh; 
     z-index: 10;
+    
+    /* ADDED ANIMATION PROPERTIES */
+    opacity: 0; /* Start hidden for fade-in */
+    visibility: hidden; 
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
 }
 
 .overlay.visible {
-    visibility: visible; 
+    opacity: 1; 
+    visibility: visible;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear; /* Remove visibility delay when showing */
 }
 
-/* Position side-by-side - Corrected positioning */
+/* Position side-by-side */
 #hw_panel {
     left: 1%; 
     top: 100px;
+    transform: translateX(-20px); /* Initial offset for slide-in from left */
+}
+
+#hw_panel.visible {
+    transform: translateX(0); /* Slide to original position */
 }
 
 #log_panel {
     right: 1%;
     top: 100px;
+    transform: translateX(20px); /* Initial offset for slide-in from right */
 }
+
+#log_panel.visible {
+    transform: translateX(0); /* Slide to original position */
+}
+
 
 /* Login panel centering */
 #login {
@@ -109,6 +128,12 @@ div {
     width: 90%; 
     max-width: 400px;
     height: auto;
+    opacity: 0; /* Override initial opacity for centering */
+    transition: opacity 0.5s ease-out; /* Only fade for login */
+}
+
+#login.visible {
+    opacity: 1;
 }
 
 
@@ -123,7 +148,6 @@ div {
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
-    /* RESTORED WORKING HEIGHT */
     max-height: 300px; 
 }
 
@@ -148,8 +172,18 @@ div {
 
 
 /* ------------------------------------- */
-/* --- BUTTONS & PROGRESS BAR --- */
+/* --- BUTTONS & PROGRESS BAR ANIMATIONS --- */
 /* ------------------------------------- */
+
+/* Keyframe for Settings Button Pulsate */
+@keyframes pulsate {
+    0% {
+        box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00;
+    }
+    100% {
+        box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5);
+    }
+}
 
 .settings_button {
     position: fixed; 
@@ -163,6 +197,9 @@ div {
     font-weight: 700;
     z-index: 30;
     text-shadow: 0 0 5px black;
+    /* ADDED PULSATING ANIMATION */
+    animation: pulsate 1.5s infinite alternate; 
+    transition: background-color 0.2s ease-in-out;
 }
 
 #do_hw {
@@ -176,11 +213,13 @@ div {
     width: 100%;
     box-sizing: border-box;
     margin: 2rem 0 0 0; 
-    transition: background-color 0.2s;
+    /* ADDED TRANSITION FOR HOVER LIFT */
+    transition: background-color 0.2s, transform 0.2s;
 }
 
 #do_hw:hover {
     background-color: #00CC00;
+    transform: translateY(-2px); /* Slight lift on hover */
 }
 
 /* Base style for the Progress Bar containers */
@@ -198,7 +237,9 @@ div {
     width: 0%;
     height: 100%;
     background-color: #00ff00;
-    transition: width 0.3s ease;
+    /* SMOOTHED PROGRESS BAR TRANSITION */
+    transition: width 0.6s ease-out; 
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); /* Progress bar glow */
 }
 
 /* Other miscellaneous styles */
