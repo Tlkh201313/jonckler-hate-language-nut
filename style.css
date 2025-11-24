@@ -37,7 +37,7 @@ div {
 }
 
 /* ------------------------------------- */
-/* --- NAVIGATION SIDEBAR FIX --- */
+/* --- NAVIGATION SIDEBAR --- */
 /* ------------------------------------- */
 
 .sidebar {
@@ -149,7 +149,7 @@ div {
     height: auto;
 }
 
-/* FIX: Increased width and adjusted left/right position for both panels */
+/* Updated positioning and width for the side panels */
 #hw_panel, #log_panel {
     background-color: rgba(145, 0, 145, 0.8); 
     border: 2px solid #00FF00; 
@@ -159,7 +159,7 @@ div {
     color: white; 
     
     position: fixed;
-    width: 38%; /* Slightly reduced width to prevent overlap on smaller screens */
+    width: 35%; /* Reduced panel width slightly to ensure space between panels */
     max-height: 90vh; 
     top: 50%;
     transform: translateY(-50%); 
@@ -193,7 +193,7 @@ div {
     display: block; /* Ensure it takes full width for clear placement */
     width: 100%;
     box-sizing: border-box;
-    margin-top: 2rem !important; /* Ensure separation from list */
+    margin-top: 1rem !important; /* Ensure separation from list - reduced to 1rem */
     transition: background-color 0.2s;
 }
 
@@ -205,8 +205,9 @@ div {
 /* --- HOMEWORK LIST STYLES --- */
 /* ------------------------------------- */
 
+/* FIX: Reduce max-height to ensure there's vertical space for the button and progress bar */
 #hw_container {
-    max-height: 70vh; 
+    max-height: 65vh; /* Reduced from 70vh to ensure button stays on screen */
 }
 
 .overflow_container {
