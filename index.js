@@ -119,7 +119,6 @@ class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
-        this.remember_me_box = document.getElementById("remember_me"); // New property
         
         // This webhook URL is based on your previous input
         this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
@@ -169,18 +168,15 @@ class client_application {
     }
     
     check_for_saved_session() {
-        // Check if the user opted for "Remember Me" AND if a token exists
-        const rememberMe = localStorage.getItem('jonckler_remember');
         const savedToken = localStorage.getItem('jonckler_token'); 
-        
-        if (savedToken && rememberMe === 'true') {
+        if (savedToken) {
             this.token = savedToken;
             return true;
         }
         return false;
     }
 
-    // MAIN function: Loading screen logic and all event listeners
+    // MAIN function: Loading screen logic restored
     main() {
         const loadingScreen = document.getElementById('loading_screen'); 
         const hasSession = this.check_for_saved_session();
@@ -202,42 +198,20 @@ class client_application {
 
         // Set up Event Listeners
         document.getElementById("logout_button").onclick = () => {
-            // Clear both the token and the remember me setting
             localStorage.removeItem('jonckler_token');
-            localStorage.removeItem('jonckler_remember'); 
-            
-            // Explicitly show the login panel and hide others for immediate visual feedback
-            showPanel('login'); 
-            document.getElementById('hw_panel').classList.remove('visible');
-            document.getElementById('log_panel').classList.remove('visible');
-
-            // Force a reload to guarantee a clean start
-            setTimeout(() => {
-                 window.location.reload(); 
-            }, 500); 
+            window.location.reload(); 
         };
 
         
         document.getElementById("login_btn").onclick = async () => {
             const username = this.username_box.value;
             const password = this.password_box.value;
-            const remember = this.remember_me_box.checked; // Check the box state
             
             const res = await this.log_in(username, password);
             
             if (res.token) {
                 this.token = res.token;
-
-                if (remember) {
-                    // Save token and "remember me" flag only if checked
-                    localStorage.setItem('jonckler_token', res.token);
-                    localStorage.setItem('jonckler_remember', 'true');
-                } else {
-                    // Ensure old token/flag are cleared if user manually logs in without check
-                    localStorage.removeItem('jonckler_token');
-                    localStorage.removeItem('jonckler_remember');
-                }
-
+                localStorage.setItem('jonckler_token', res.token);
                 this.on_log_in();
             } else {
                 alert("Login failed. Check username and password.");
