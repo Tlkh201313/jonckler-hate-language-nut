@@ -8,7 +8,6 @@ body {
     font-size: 1.05rem;
     background-image: url("./hellfire.gif");
     background-repeat: no-repeat;
-    /* FIX: Set cover size and min-height for scrollability */
     background-size: cover; 
     background-attachment: fixed;
     min-height: 120vh; 
@@ -123,12 +122,9 @@ div {
     border-radius: 0.5rem;
     background-color: rgba(0, 0, 0, 0.3);
     margin-top: 0.5rem;
-    
-    /* FIX: Reduced height for smaller selection area */
     max-height: 300px; 
 }
 
-/* Explicitly set for log container too, although it uses the generic class above */
 #log_container {
     max-height: 300px; 
 }
@@ -177,7 +173,8 @@ div {
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    /* Margin is now handled in the HTML inline style, but keeping the block settings */
+    /* FIX: Set 2rem margin via CSS */
+    margin: 2rem 0 0 0; 
     transition: background-color 0.2s;
 }
 
@@ -185,7 +182,8 @@ div {
     background-color: #00CC00;
 }
 
-#hw_bar { 
+/* Base style for the Progress Bar containers */
+.progress_bar_container {
     height: 1rem;
     background-color: #333333; 
     border-radius: 5px;
@@ -193,6 +191,7 @@ div {
     margin: 10px 0; 
 }
 
+/* FIX: Applies to both #hw_bar and the new #log_bar */
 .progress_bar { 
     padding: 0;
     width: 0%;
