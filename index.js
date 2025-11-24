@@ -433,11 +433,17 @@ class client_application {
             ".task > input[type=checkbox]:checked",
         );
         const logs = document.getElementById("log_container");
+        const hw_bar = document.getElementById("hw_bar"); // Reference Homework bar
+        const log_bar = document.getElementById("log_bar"); // Reference Log bar
+
         logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
-        const progress_bar = document.getElementById("hw_bar");
+        
         let task_id = 1;
         let progress = 0;
-        progress_bar.style.width = "0%";
+        
+        hw_bar.style.width = "0%"; // Reset bars
+        log_bar.style.width = "0%";
+
         const funcs = [];
         for (const c of checkboxes) {
             const parts = c.id.split("-");
@@ -458,15 +464,24 @@ class client_application {
                     }
                     logs.innerHTML += `<b>fetched vocabs for task ${id}</b>`;
                     logs.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
+                    
+                    // Update progress (Step 1: Fetching)
                     progress += 1;
-                    progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
+                    const progress_percent = (progress / checkboxes.length) * 0.5 * 100;
+                    hw_bar.style.width = `${String(progress_percent)}%`;
+                    log_bar.style.width = `${String(progress_percent)}%`; // Update Log bar
+                    
                     console.log("Calling send_answers with answers:", answers);
                     const result = await task_doer.send_answers(answers);
                     logs.innerHTML += `<b>task ${id} done, scored ${result.score}</b>`;
                     logs.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
                     logs.scrollTop = logs.scrollHeight;
+                    
+                    // Update progress (Step 2: Sending)
                     progress += 1;
-                    progress_bar.style.width = `${String((progress / checkboxes.length) * 0.5 * 100)}%`;
+                    const final_progress_percent = (progress / checkboxes.length) * 0.5 * 100;
+                    hw_bar.style.width = `${String(final_progress_percent)}%`;
+                    log_bar.style.width = `${String(final_progress_percent)}%`; // Update Log bar
                 })(task_id++),
             );
         }
