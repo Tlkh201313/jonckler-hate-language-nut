@@ -119,7 +119,6 @@ class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
-        // NOTE: The remember_me_box is removed since the HTML no longer includes it.
         
         // This webhook URL is based on your previous input
         this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
@@ -168,7 +167,7 @@ class client_application {
         return json;
     }
     
-    // Auto-login is now based purely on the existence of a saved token
+    // Check for saved session now only checks for the token
     check_for_saved_session() {
         const savedToken = localStorage.getItem('jonckler_token'); 
         
@@ -194,7 +193,6 @@ class client_application {
                 console.log("Session found. Logging in automatically.");
                 this.on_log_in();
             } else {
-                // If no token, always show the login screen
                 showPanel('login'); 
             }
 
@@ -202,7 +200,7 @@ class client_application {
 
         // Set up Event Listeners
         document.getElementById("logout_button").onclick = () => {
-            // Clear the token
+            // Clear the token to force log out
             localStorage.removeItem('jonckler_token');
             
             // Explicitly show the login panel and hide others for immediate visual feedback
@@ -225,8 +223,8 @@ class client_application {
             
             if (res.token) {
                 this.token = res.token;
-                
-                // Store the token (auto-login next time, as there is no "remember me" choice)
+
+                // Save token for future auto-login
                 localStorage.setItem('jonckler_token', res.token);
                 
                 this.on_log_in();
