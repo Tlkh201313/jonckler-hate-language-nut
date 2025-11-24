@@ -30,13 +30,25 @@ button {
     100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+/* NEW DOT ANIMATION KEYFRAMES */
+@keyframes loading {
+    0%{
+     transform: translateX(0);
+    }
+    25%{
+     transform: translateX(15px);
+    }
+    50%{
+     transform: translateX(-15px);
+    }
+    100%{
+     transform: translateX(0);
+    }
 }
 
+
 /* ------------------------------------- */
-/* --- LOADING SCREEN STYLES --- */
+/* --- LOADING SCREEN STYLES (UPDATED) --- */
 /* ------------------------------------- */
 
 #loading_screen {
@@ -53,7 +65,6 @@ button {
     align-items: center;
     color: #00FF00;
     font-size: 1.5rem;
-    /* Transition for fading out */
     transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
 }
 
@@ -62,15 +73,30 @@ button {
     visibility: hidden;
 }
 
-.spinner {
-    border: 8px solid #333;
-    border-top: 8px solid #00FF00;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
+/* NEW DOT ANIMATION STYLES */
+.loader {
+    display: flex;
+    align-items: center;
     margin-bottom: 20px;
 }
+
+.loader span {
+    height: 25px;
+    width: 25px;
+    margin-right: 10px;
+    border-radius: 50%;
+    background-color: #00FF00; /* Set to your highlight color */
+    animation: loading 1s linear infinite;
+}
+
+/* Delay for the wave effect */
+.loader span:nth-child(1) { animation-delay: 0.1s; }
+.loader span:nth-child(2) { animation-delay: 0.2s; }
+.loader span:nth-child(3) { animation-delay: 0.3s; }
+.loader span:nth-child(4) { animation-delay: 0.4s; }
+.loader span:nth-child(5) { animation-delay: 0.5s; }
+.loader span:nth-child(6) { animation-delay: 0.6s; }
+
 
 /* ------------------------------------- */
 /* --- GENERAL STYLES & HEADINGS --- */
