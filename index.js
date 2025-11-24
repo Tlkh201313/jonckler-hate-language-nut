@@ -299,7 +299,7 @@ class client_application {
     main() {
         const loadingScreen = document.getElementById('loading_screen');
 
-        // Simulate a brief loading time (e.g., 2 seconds)
+        // This ensures the loading screen shows for at least 1.5 seconds every time the page loads.
         setTimeout(() => {
             // 1. Hide the loading screen
             loadingScreen.classList.add('hidden'); 
