@@ -209,7 +209,8 @@ class task_completer {
 
 // --- Function to toggle panels (Now just for login/HW/logs visibility) ---
 function showPanel(panelId) {
-    const panels = ['login', 'hw_panel', 'log_panel'];
+    // Added 'bottom_right_panel' here
+    const panels = ['login', 'hw_panel', 'log_panel', 'bottom_right_panel'];
     
     // Hide all main panels
     panels.forEach(id => {
@@ -327,9 +328,10 @@ class client_application {
         // Hide login panel
         showPanel(''); 
         
-        // Show BOTH HW and Logs panels
+        // Show all main panels
         document.getElementById('hw_panel').classList.add('visible');
         document.getElementById('log_panel').classList.add('visible');
+        document.getElementById('bottom_right_panel').classList.add('visible'); // New panel made visible
         
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
