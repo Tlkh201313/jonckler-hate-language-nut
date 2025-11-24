@@ -167,10 +167,8 @@ class client_application {
         return json;
     }
     
-    // Check for saved session now only checks for the token
     check_for_saved_session() {
         const savedToken = localStorage.getItem('jonckler_token'); 
-        
         if (savedToken) {
             this.token = savedToken;
             return true;
@@ -199,19 +197,10 @@ class client_application {
         }, 1500); // 1500ms = 1.5 seconds loading time
 
         // Set up Event Listeners
+        // LOGOUT FIX IS HERE
         document.getElementById("logout_button").onclick = () => {
-            // Clear the token to force log out
             localStorage.removeItem('jonckler_token');
-            
-            // Explicitly show the login panel and hide others for immediate visual feedback
-            showPanel('login'); 
-            document.getElementById('hw_panel').classList.remove('visible');
-            document.getElementById('log_panel').classList.remove('visible');
-
-            // Force a reload to guarantee a clean start
-            setTimeout(() => {
-                 window.location.reload(); 
-            }, 500); 
+            window.location.reload(); 
         };
 
         
@@ -223,10 +212,7 @@ class client_application {
             
             if (res.token) {
                 this.token = res.token;
-
-                // Save token for future auto-login
                 localStorage.setItem('jonckler_token', res.token);
-                
                 this.on_log_in();
             } else {
                 alert("Login failed. Check username and password.");
