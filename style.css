@@ -127,18 +127,6 @@ h2 {
     color: black; 
 }
 
-/* Style for the new Remember Me checkbox container */
-#remember_me_container {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
-#remember_me_container label {
-    margin-left: 8px;
-    font-size: 0.9rem;
-}
-
 #login_btn { 
     background-color: lightgray; 
     color: black; 
@@ -151,7 +139,7 @@ h2 {
 
 #login_btn:hover { 
     background-color: #00CC00; 
-    transform: scale(1.02); 
+    transform: scale(1.02); /* SCALING FIX */
     box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
 }
 
@@ -312,17 +300,17 @@ h2 {
     font-weight: 900;
     border: 3px solid #00CC00;
     border-radius: 8px;
-    **padding: 8px 15px;** /* Smaller padding for smaller button */
+    padding: 10px 20px;
     display: block; 
     width: 100%;
     box-sizing: border-box;
-    **margin: 1rem 0 0 0;** /* Smaller margin to match smaller button */
+    margin: 2rem 0 0 0; 
     transition: background-color 0.2s, transform 0.2s;
 }
 
 #do_hw:hover {
     background-color: #00CC00;
-    transform: scale(1.01); 
+    **transform: scale(1.01);** /* SCALING FIX */
 }
 
 .progress_bar_container {
