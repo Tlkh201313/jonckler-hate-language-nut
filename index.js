@@ -327,7 +327,7 @@ class client_application {
         // Hide login panel
         showPanel(''); 
         
-        // Show all main panels
+        // Show BOTH HW and Logs panels
         document.getElementById('hw_panel').classList.add('visible');
         document.getElementById('log_panel').classList.add('visible');
         
