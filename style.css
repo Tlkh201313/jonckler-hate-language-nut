@@ -30,7 +30,7 @@ button {
     100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
 }
 
-/* NEW DOT ANIMATION KEYFRAMES */
+/* DOT ANIMATION KEYFRAMES */
 @keyframes loading {
     0%{
      transform: translateX(0);
@@ -48,7 +48,7 @@ button {
 
 
 /* ------------------------------------- */
-/* --- LOADING SCREEN STYLES (UPDATED) --- */
+/* --- LOADING SCREEN STYLES --- */
 /* ------------------------------------- */
 
 #loading_screen {
@@ -73,7 +73,7 @@ button {
     visibility: hidden;
 }
 
-/* NEW DOT ANIMATION STYLES */
+/* DOT ANIMATION STYLES */
 .loader {
     display: flex;
     align-items: center;
@@ -148,7 +148,7 @@ div {
 
 
 /* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES (BLACK) --- */
+/* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
 .overlay {
@@ -162,47 +162,30 @@ div {
     
     opacity: 0; 
     visibility: hidden; 
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
+    /* Base transition for both visibility/opacity and the slide (transform) */
+    transition: 
+        opacity 0.5s ease-out, 
+        transform 0.5s ease-out, 
+        visibility 0s linear 0.5s;
 }
 
 .overlay.visible {
     opacity: 1; 
     visibility: visible;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear;
-}
-
-/* Position side-by-side */
-#hw_panel {
-    left: 1%; 
-    top: 100px;
-    transform: translateX(-20px);
-}
-
-#hw_panel.visible {
-    transform: translateX(0);
-}
-
-#log_panel {
-    right: 1%;
-    top: 100px;
-    transform: translateX(20px);
-}
-
-#log_panel.visible {
-    transform: translateX(0);
+    /* When visible, remove the initial transform to slide into place */
+    transform: translateX(0) !important; 
+    transition: 
+        opacity 0.5s ease-out, 
+        transform 0.5s ease-out, 
+        visibility 0s linear;
 }
 
 
-/* Login panel centering (ALSO BLACK) */
+/* Login panel centering (inline styles in HTML) */
 #login {
     background-color: rgba(0, 0, 0, 0.95);
     border: 2px solid #00FF00;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%; 
-    max-width: 400px;
-    height: auto;
+    /* Position is now handled by inline style in HTML */
     opacity: 0;
     transition: opacity 0.5s ease-out;
 }
