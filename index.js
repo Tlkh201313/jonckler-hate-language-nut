@@ -207,6 +207,27 @@ class task_completer {
     }
 }
 
+// --- NEW FUNCTION: Show/Hide Panels (Needed for Sidebar to work) ---
+function showPanel(panelId) {
+    const panels = ['login', 'hw_panel', 'log_panel'];
+    
+    // Hide all main panels
+    panels.forEach(id => {
+        const panel = document.getElementById(id);
+        if (panel) {
+            panel.classList.remove('visible');
+        }
+    });
+
+    // Show the target panel
+    const targetPanel = document.getElementById(panelId);
+    if (targetPanel) {
+        targetPanel.classList.add('visible');
+    }
+}
+// --- END NEW FUNCTION ---
+
+
 class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
@@ -278,8 +299,21 @@ class client_application {
 
     main() {
         // ⭐ FIX: Ensure login panel is visible on load using the 'visible' class
-        document.getElementById("login").classList.add('visible'); 
+        showPanel('login'); 
         
+        // ⭐ NEW: Attach click handlers to the new navigation links in the sidebar
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const target = item.getAttribute('data-target');
+                    if (target) {
+                        showPanel(target);
+                    }
+                });
+            });
+        });
+
         document.getElementById("login_btn").onclick = async () => {
             const username = this.username_box.value;
             const password = this.password_box.value;
@@ -307,16 +341,10 @@ class client_application {
     }
 
     on_log_in() {
-        // ⭐ FIX: Use classList for smooth and consistent transitions defined in CSS
+        // ⭐ FIX: Use showPanel to hide login and show only the HW panel ⭐
+        showPanel('hw_panel'); 
         
-        // 1. Hide the login panel
-        document.getElementById("login").classList.remove('visible'); 
-        
-        // 2. Show the HW and Log panels
-        document.getElementById("hw_panel").classList.add('visible');
-        document.getElementById("log_panel").classList.add('visible'); 
-        
-        // 3. Setup the rest of the application
+        // 2. Setup the rest of the application
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
