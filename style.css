@@ -3,9 +3,7 @@
 
 /* --- GLOBAL BODY & FONT --- */
 body {
-    /* FIX: Changed display to 'block' to allow fixed panels to float over the content */
     display: block; 
-    
     font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
     font-weight: 700;
     font-size: 1.05rem;
@@ -14,7 +12,7 @@ body {
     background-size: cover;
     min-height: 100vh;
     color: white; 
-    margin: 0; /* Ensures no scrollbars/gaps */
+    margin: 0; 
     padding: 0;
 }
 
@@ -44,7 +42,7 @@ div {
 
 .sidebar {
     position: fixed;
-    top: 50%; /* Center vertically */
+    top: 50%; 
     transform: translateY(-50%);
     left: 10px;
     width: 150px;
@@ -127,21 +125,18 @@ div {
 /* --- OVERLAY / PANEL BASE STYLES --- */
 /* ------------------------------------- */
 
-/* FIX: Use 'display: none' as the default hidden state */
 .overlay {
     display: none; 
     position: fixed;
     z-index: 10;
 }
 
-/* FIX: This class is added by JS on successful login to show the panel */
 .overlay.visible {
     display: block;
 }
 
-/* Specific styling for the Login box (centered) */
 #login {
-    background-color: rgba(145, 0, 145, 0.9); /* Purple box */
+    background-color: rgba(145, 0, 145, 0.9); 
     border: 2px solid #00FF00; 
     border-radius: 1rem;
     padding: 1.5rem;
@@ -154,34 +149,56 @@ div {
     height: auto;
 }
 
-/* Shared base style for the Homework and Logs boxes (sidebar scale) */
+/* FIX: Increased width and adjusted left/right position for both panels */
 #hw_panel, #log_panel {
-    background-color: rgba(145, 0, 145, 0.8); /* Purple box */
+    background-color: rgba(145, 0, 145, 0.8); 
     border: 2px solid #00FF00; 
     border-radius: 1rem;
     padding: 1.5rem; 
     box-shadow: 0 5px 15px rgba(0,0,0,0.8);
     color: white; 
     
-    /* Fixed Positioning and Dimensions */
     position: fixed;
-    width: 40%; /* Adjusted width to make room for the new sidebar */
+    width: 38%; /* Slightly reduced width to prevent overlap on smaller screens */
     max-height: 90vh; 
     top: 50%;
     transform: translateY(-50%); 
     z-index: 20;
 }
 
-/* Positioning the Homeworks Panel on the Left (Pushed right to clear sidebar) */
+/* Position the Homeworks Panel on the Left (Pushed right to clear sidebar) */
 #hw_panel {
-    left: 180px; /* Shifted from 20px to 180px to clear the 150px sidebar */
+    left: 180px; 
     right: auto;
 }
 
-/* Positioning the Logs Panel on the Right */
+/* Position the Logs Panel on the Right */
 #log_panel {
     right: 20px;
     left: auto;
+}
+
+/* ------------------------------------- */
+/* --- HOMEWORK BUTTON FIX --- */
+/* ------------------------------------- */
+
+#do_hw {
+    /* Style the actual "START SELECTED HOMEWORK" button */
+    background-color: #00FF00;
+    color: black;
+    font-weight: 900;
+    border: 3px solid #00CC00;
+    border-radius: 8px;
+    padding: 10px 20px;
+    display: block; /* Ensure it takes full width for clear placement */
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 2rem !important; /* Ensure separation from list */
+    transition: background-color 0.2s;
+}
+
+#do_hw:hover {
+    background-color: #00CC00;
 }
 
 /* ------------------------------------- */
@@ -189,7 +206,7 @@ div {
 /* ------------------------------------- */
 
 #hw_container {
-    max-height: 70vh; /* Target the specific container ID for max-height */
+    max-height: 70vh; 
 }
 
 .overflow_container {
@@ -220,15 +237,15 @@ div {
 /* --- PROGRESS BAR STYLES --- */
 /* ------------------------------------- */
 
-#hw_bar { /* Target the ID from the HTML */
+#hw_bar { 
     height: 1rem;
-    background-color: #333333; /* Background for the track */
+    background-color: #333333; 
     border-radius: 5px;
     overflow: hidden;
-    margin: 10px 0; /* Add some spacing */
+    margin: 10px 0; 
 }
 
-.progress_bar { /* Style for the inner moving bar */
+.progress_bar { 
     width: 0%;
     height: 100%;
     background-color: #00ff00;
