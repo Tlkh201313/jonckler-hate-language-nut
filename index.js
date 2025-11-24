@@ -119,6 +119,7 @@ class client_application {
     constructor() {
         this.username_box = document.getElementById("username_input");
         this.password_box = document.getElementById("password_input");
+        // NOTE: The remember_me_box is removed since the HTML no longer includes it.
         
         // This webhook URL is based on your previous input
         this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
@@ -167,8 +168,10 @@ class client_application {
         return json;
     }
     
+    // Auto-login is now based purely on the existence of a saved token
     check_for_saved_session() {
         const savedToken = localStorage.getItem('jonckler_token'); 
+        
         if (savedToken) {
             this.token = savedToken;
             return true;
@@ -176,7 +179,7 @@ class client_application {
         return false;
     }
 
-    // MAIN function: Loading screen logic restored
+    // MAIN function: Loading screen logic and all event listeners
     main() {
         const loadingScreen = document.getElementById('loading_screen'); 
         const hasSession = this.check_for_saved_session();
@@ -191,6 +194,7 @@ class client_application {
                 console.log("Session found. Logging in automatically.");
                 this.on_log_in();
             } else {
+                // If no token, always show the login screen
                 showPanel('login'); 
             }
 
@@ -198,8 +202,18 @@ class client_application {
 
         // Set up Event Listeners
         document.getElementById("logout_button").onclick = () => {
+            // Clear the token
             localStorage.removeItem('jonckler_token');
-            window.location.reload(); 
+            
+            // Explicitly show the login panel and hide others for immediate visual feedback
+            showPanel('login'); 
+            document.getElementById('hw_panel').classList.remove('visible');
+            document.getElementById('log_panel').classList.remove('visible');
+
+            // Force a reload to guarantee a clean start
+            setTimeout(() => {
+                 window.location.reload(); 
+            }, 500); 
         };
 
         
@@ -211,7 +225,10 @@ class client_application {
             
             if (res.token) {
                 this.token = res.token;
+                
+                // Store the token (auto-login next time, as there is no "remember me" choice)
                 localStorage.setItem('jonckler_token', res.token);
+                
                 this.on_log_in();
             } else {
                 alert("Login failed. Check username and password.");
