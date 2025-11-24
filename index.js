@@ -16,7 +16,7 @@ function secondsToString(seconds) {
     const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
     const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
-    return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
+    return `${numyears} years ${numdays} days ${numhours} minutes ${numseconds} seconds`;
 }
 
 function set_checkboxes(node, state) {
@@ -225,6 +225,14 @@ function showPanel(panelId) {
         targetPanel.classList.add('visible');
     }
 }
+
+// --- NEW FUNCTION: Hides the Login Link/Button after successful login ---
+function hideLoginLink() {
+    const loginLink = document.querySelector('.nav-item[data-target="login"]');
+    if (loginLink) {
+        loginLink.style.display = 'none'; // Hide the list item in the sidebar
+    }
+}
 // --- END NEW FUNCTION ---
 
 
@@ -298,10 +306,10 @@ class client_application {
     }
 
     main() {
-        // ⭐ FIX: Ensure login panel is visible on load using the 'visible' class
+        // ⭐ FIX: Show login panel on load
         showPanel('login'); 
         
-        // ⭐ NEW: Attach click handlers to the new navigation links in the sidebar
+        // Attach click handlers to the new navigation links in the sidebar
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.addEventListener('click', (e) => {
@@ -341,10 +349,13 @@ class client_application {
     }
 
     on_log_in() {
-        // ⭐ FIX: Use showPanel to hide login and show only the HW panel ⭐
+        // ⭐ FIX 1: Hide the Login sidebar link
+        hideLoginLink();
+        
+        // ⭐ FIX 2: Show the HW panel immediately after login
         showPanel('hw_panel'); 
         
-        // 2. Setup the rest of the application
+        // 3. Setup the rest of the application
         document.getElementById("do_hw").onclick = () => {
             app.do_hwks();
         };
