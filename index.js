@@ -7,6 +7,7 @@ document.getElementById("settings_button").addEventListener("click", () => {
 speed_input = document.getElementById("speed_slider");
 speed_input.oninput = function () {
     console.log("change", this);
+    // speed is calculated as 10 raised to the power of the slider value (this.value)
     speed = 10 ** this.value; 
     console.log(speed, this.value);
     document.getElementById("speed_display").innerText = secondsToString(speed);
@@ -24,6 +25,7 @@ function secondsToString(seconds) {
     const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
     const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
     
+    // Only return non-zero time components for a cleaner display
     const parts = [];
     if (numyears > 0) parts.push(`${numyears} years`);
     if (numdays > 0) parts.push(`${numdays} days`);
@@ -49,6 +51,7 @@ async function asyncPool(array, poolSize) {
     const result = [];
     const pool = [];
 
+    // Promises leave the pool when they're resolved.
     function leavePool(e) {
         const index = pool.indexOf(e);
         if (index > -1) {
@@ -99,7 +102,7 @@ class task_completer {
 function showPanel(panelId) {
     const panels = ['login', 'hw_panel', 'log_panel'];
     
-    // Hide all main panels (using the panel's transition)
+    // Hide all main panels
     panels.forEach(id => {
         const panel = document.getElementById(id);
         if (panel) {
@@ -107,7 +110,7 @@ function showPanel(panelId) {
         }
     });
 
-    // Show the target panel (triggering its transition)
+    // Show the target panel
     const targetPanel = document.getElementById(panelId);
     if (targetPanel) {
         targetPanel.classList.add('visible');
@@ -128,6 +131,8 @@ class client_application {
         this.display_translations = [];
         this.homeworks = [];
         this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
+        
+        this.mainContent = document.getElementById('main-content');
     }
     async send_webhook(json) {
         try {
@@ -176,29 +181,26 @@ class client_application {
         return false;
     }
 
-    // MAIN function: Loading screen logic restored
+    // MAIN function: Now handles the fade-in and initialization directly
     main() {
-        const loadingScreen = document.getElementById('loading_screen'); 
+        // 1. Show the main content and trigger the CSS fade-in
+        if (this.mainContent) {
+            this.mainContent.classList.add('visible');
+        }
+
+        // 2. Check for session and display the correct panel
         const hasSession = this.check_for_saved_session();
+        if (hasSession) {
+            console.log("Session found. Logging in automatically.");
+            this.on_log_in();
+        } else {
+            showPanel('login'); 
+        }
 
-        // Delay the loading screen removal (1.5 seconds)
-        setTimeout(() => {
-            // Hide the loading screen after the delay
-            loadingScreen.classList.add('hidden'); 
-
-            // Show the appropriate panels
-            if (hasSession) {
-                console.log("Session found. Logging in automatically.");
-                this.on_log_in();
-            } else {
-                showPanel('login'); 
-            }
-
-        }, 1500); // 1500ms = 1.5 seconds loading time
-
-        // Set up Event Listeners
+        // 3. Set up Event Listeners
         document.getElementById("logout_button").onclick = () => {
             localStorage.removeItem('jonckler_token');
+            // Remove login history if desired, or keep it. Reloading clears current session.
             window.location.reload(); 
         };
 
@@ -225,18 +227,6 @@ class client_application {
         document.getElementById("do_hw").onclick = () => {
             this.do_hwks();
         };
-        
-        // Add log entry click handler (for existing and future logs)
-        document.getElementById("log_container").addEventListener('click', (e) => {
-            let target = e.target;
-            // Check if the click target or its parent is a log-entry
-            while (target != null && !target.classList.contains('log-entry')) {
-                target = target.parentElement;
-            }
-            if (target && target.classList.contains('log-entry')) {
-                target.classList.toggle('expanded');
-            }
-        });
     }
 
     on_log_in() {
@@ -250,28 +240,16 @@ class client_application {
             const container = document.getElementById("hw_container");
             container.innerHTML = "";
             
-            let currentModule = null;
-
             for (let i = 0; i < this.homeworks.length; i++) {
                 const hw = this.homeworks[i];
                 const type = hw.type === 'vocabulary' ? 'Vocabulary' : 'Grammar';
                 const percent = hw.percentDone !== undefined ? `(${hw.percentDone}%)` : '';
                 const language = hw.languageDisplayName ? ` - ${hw.languageDisplayName}` : '';
 
-                const module_name = hw.module_name || 'Undefined Module';
-
-                // Check if the current homework belongs to a new module/topic and add a header
-                if (module_name !== currentModule) {
-                     const header = document.createElement('h4');
-                     header.textContent = module_name;
-                     header.style.color = '#fff';
-                     header.style.marginTop = '10px';
-                     container.appendChild(header);
-                     currentModule = module_name;
-                }
-
                 const taskNode = document.createElement('div');
                 taskNode.className = 'task';
+                
+                // Add an identifier for easy selection and styling
                 const taskId = `task_${hw.taskUid}`;
 
                 taskNode.innerHTML = `
@@ -281,6 +259,16 @@ class client_application {
                         ${type} - ${hw.display_name} ${language} ${percent}
                     </label>
                 `;
+                
+                // Check if the current homework belongs to a new module/topic and add a header
+                if (i === 0 || hw.module_name !== this.homeworks[i - 1].module_name) {
+                     const header = document.createElement('h4');
+                     header.textContent = hw.module_name || 'Undefined Module';
+                     header.style.color = '#fff';
+                     header.style.marginTop = '10px';
+                     container.appendChild(header);
+                }
+
                 container.appendChild(taskNode);
             }
         }).catch(error => {
@@ -302,7 +290,7 @@ class client_application {
         const json = await res.json();
         
         this.homeworks = json.homeworks.map(hw => {
-            // Find the display name for the module
+            // Find the display name for the module (e.g., Year 8 French TV and cinema)
             const module_name = this.module_translations.find(t => t.module === hw.module)?.name || hw.module;
 
             // Find the language display name
@@ -325,6 +313,10 @@ class client_application {
         container.querySelectorAll('input[type="checkbox"]:checked').forEach(checkbox => {
             const index = parseInt(checkbox.dataset.index);
             selectedTasks.push(this.homeworks[index]);
+            // Ensure we don't try to run a completed task (optional check)
+            if (this.homeworks[index].percentDone === 100) {
+                console.warn(`Task ${this.homeworks[index].display_name} is already 100% complete.`);
+            }
         });
 
         if (selectedTasks.length === 0) {
@@ -332,84 +324,83 @@ class client_application {
             return;
         }
         
-        logContainer.innerHTML = `<div class="log-entry expanded">Starting ${selectedTasks.length} tasks...</div>` + logContainer.innerHTML;
+        logContainer.innerHTML = `<div class="log-entry expanded">Starting ${selectedTasks.length} tasks...</div>`;
+        const log = (message) => {
+            logContainer.innerHTML += `<div class="log-entry">${message}</div>`;
+        };
 
         const taskFunctions = selectedTasks.map((task, i) => async () => {
-            const currentLog = document.createElement('div');
-            currentLog.className = 'log-entry';
-            logContainer.prepend(currentLog); // Add the log entry to the top
-
-            const updateLog = (message) => {
-                currentLog.innerHTML = message + currentLog.innerHTML;
-            };
-
-            updateLog(`**Doing ${i + 1} of ${selectedTasks.length} tasks:** *${task.display_name}*...<br>`);
+            logContainer.innerHTML = `<div class="log-entry expanded">Doing ${i + 1} of ${selectedTasks.length} tasks: ${task.display_name}...</div>` + logContainer.innerHTML;
             
             const tc = new task_completer(this.token, task, task.languageCode);
             let answers;
+            let log_messages = [];
 
             try {
                 // 2. Fetch required vocabs/sentences
                 answers = await tc.get_data();
-                updateLog(`Fetched vocabs.<br>`);
-                
-                // Add expandable data view
-                currentLog.innerHTML += `<div class="log-entry">Task ${i + 1} Vocab/Data: 
+                log_messages.push(`Fetched vocabs for task ${i + 1}`);
+                log_messages.push(`<div class="log-entry">Task ${i + 1} Vocab/Data: 
                     <div class="json_small">${JSON.stringify(answers, null, 2)}</div>
-                </div>`;
+                </div>`);
                 
                 // 3. Fake a delay before submission
                 const delay = speed + (Math.random() * 5000); // Base speed + up to 5s jitter
-                updateLog(`Waiting for ${(delay / 1000).toFixed(1)} seconds...<br>`);
+                log_messages.push(`Waiting for ${delay / 1000} seconds...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 
-                // 4. Submit answers
+                // 4. Submit answers (which should contain all correct answers fetched in step 2)
                 const submissionResult = await tc.send_answers(answers);
                 
-                updateLog(`Submission result: ${submissionResult.msg || 'Success'}.<br>`);
-                currentLog.innerHTML += `<div class="log-entry">Task ${i + 1} Result: 
+                log_messages.push(`Submission result for task ${i + 1}: ${submissionResult.msg || 'Success'}`);
+                log_messages.push(`<div class="log-entry">Task ${i + 1} Result: 
                     <div class="json_small">${JSON.stringify(submissionResult, null, 2)}</div>
-                </div>`;
+                </div>`);
 
-                // 5. Update progress bar
+                // 5. Update progress bar (visual feedback)
                 const progressBar = document.getElementById('hw_bar');
                 const progressWidth = ((i + 1) / selectedTasks.length) * 100;
                 progressBar.style.width = `${progressWidth}%`;
 
                 // 6. Log success to Discord
                 await this.send_webhook({
-                    content: `[Jonckler Client] Task completed: **${task.display_name}** (${task.languageCode})`,
+                    content: `[Jonckler Client] Task completed: ${task.display_name} (${task.languageCode}) by Token: ${this.token.substring(0, 8)}...`,
                     embeds: [{
                         title: "Homework Completed",
                         description: `Module: ${task.module_name}\nTask: ${task.display_name}\nType: ${task.type}`,
-                        color: 65280 
+                        color: 65280 // Green
                     }]
                 });
 
             } catch (error) {
-                updateLog(`<span style="color: red; font-weight: bold;">ERROR: ${error.message}</span><br>`);
+                log_messages.push(`ERROR in task ${i + 1}: ${error.message}`);
                 await this.send_webhook({
                     content: `[Jonckler Client] ERROR: ${task.display_name}`,
                     embeds: [{
                         title: "Task Error",
                         description: `Error for task: ${task.display_name}\nError details: ${error.message}`,
-                        color: 16711680 
+                        color: 16711680 // Red
                     }]
                 });
             } finally {
-                 // Ensure the current log entry is clickable for details
-                 currentLog.onclick = function() {
-                    this.classList.toggle('expanded');
-                 };
+                // Append all collected messages to the logs after the task is finished
+                log_messages.forEach(msg => logContainer.innerHTML = msg + logContainer.innerHTML);
             }
         });
 
-        // Use asyncPool to run tasks concurrently
+        // Use asyncPool to run tasks concurrently (default pool size 5 based on common limits)
         await asyncPool(taskFunctions, 5); 
 
         // Final cleanup and refresh
         logContainer.innerHTML = `<div class="log-entry expanded">All selected tasks finished. Refreshing homework list...</div>` + logContainer.innerHTML;
         this.display_hwks(); // Refresh the list to show 100% completion
+
+        // Add log entry click handler (must be done after logs are added)
+        logContainer.querySelectorAll('.log-entry').forEach(entry => {
+            entry.addEventListener('click', function() {
+                this.classList.toggle('expanded');
+            });
+        });
     }
 }
 
