@@ -1,3 +1,7 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
+
+/* --- GLOBAL BODY & FONT --- */
 /* --- Base Styles --- */
 body {
     background-color: rgb(35, 35, 35);
