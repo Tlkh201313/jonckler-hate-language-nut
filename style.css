@@ -1,37 +1,32 @@
 /* --- Base Styles --- */
 body {
     background-color: rgb(35, 35, 35);
-    background-image: url("evil-jonkler.jpg"); /* Jonckler background remains */
+    background-image: url("evil-jonkler.jpg"); /* Assuming this is the background image */
     background-size: cover;
     background-repeat: no-repeat;
     background-attachment: fixed;
     color: white;
     font-family: Arial, sans-serif;
     margin: 0;
-    /* Changed body to flex for centering, will adjust main-content */
-    display: flex; 
+    display: flex;
     flex-direction: column;
     align-items: center;
     padding-top: 10vh;
 }
 
-/* --- Main Content Fade-In --- */
-#main-content {
-    opacity: 0;
-    transition: opacity 1.5s ease-in; /* Fade in over 1.5 seconds */
-    width: 100%; /* Take full width to center its children */
-    display: flex; /* Make it a flex container to center its children */
-    flex-direction: column;
-    align-items: center;
+img {
+    margin-bottom: 20px;
 }
 
-#main-content.visible {
-    opacity: 1;
+h2 {
+    color: #00FF00;
+    text-shadow: 0 0 5px black;
+    text-align: center;
 }
 
 /* --- Panels (Containers) --- */
 .overlay {
-    position: fixed; /* Keep panels fixed for consistent positioning */
+    position: fixed;
     top: 50%;
     transform: translateY(-50%);
     width: 30%;
@@ -185,6 +180,52 @@ body {
 .log-entry.expanded {
     border-left: 3px solid #FFFF00; /* Change border color when expanded */
     background-color: rgba(0, 0, 0, 0.7);
+}
+
+
+/* --- Loading Screen Styles --- */
+#loading_screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(35, 35, 35, 1);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 50;
+    transition: opacity 1s ease-out;
+}
+
+#loading_screen.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.loader {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.loader span {
+    width: 15px;
+    height: 15px;
+    margin: 0 5px;
+    background-color: #00FF00;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.loader span:nth-child(1) { animation-delay: -0.32s; }
+.loader span:nth-child(2) { animation-delay: -0.16s; }
+
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1.0); }
 }
 
 /* --- Settings Dialog --- */
