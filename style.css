@@ -1,238 +1,149 @@
-@import url('https://fonts.googleapis.com/css2?family=Space+Mono&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Comic+Neue&display=swap');
-
-/* ------------------------------------- */
-/* --- GLOBAL BODY & FONT --- */
-/* ------------------------------------- */
-
+/* --- Base Styles --- */
 body {
-    font-family: "Comic Sans MS", "Comic Sans", "Comic Neue", cursive;
-    font-weight: 700;
-    font-size: 1.05rem;
-    background-image: url("./hellfire.gif");
-    background-repeat: no-repeat;
-    background-size: cover; 
-    background-attachment: fixed;
-    min-height: 100vh; 
-    color: white; 
-    margin: 0; 
-    padding: 0;
+    background-color: rgb(35, 35, 35);
+    background-image: url("evil-jonkler.jpg"); /* Jonckler background remains */
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    /* Changed body to flex for centering, will adjust main-content */
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    padding-top: 10vh;
 }
 
-button {
-    font-family: inherit;
-    cursor: pointer;
+/* --- Main Content Fade-In --- */
+#main-content {
+    opacity: 0;
+    transition: opacity 1.5s ease-in; /* Fade in over 1.5 seconds */
+    width: 100%; /* Take full width to center its children */
+    display: flex; /* Make it a flex container to center its children */
+    flex-direction: column;
+    align-items: center;
 }
 
-img[src*="languagenut"] {
-    display: block;
-    margin: 50px auto 20px auto;
+#main-content.visible {
+    opacity: 1;
 }
 
-/* ------------------------------------- */
-/* --- KEYFRAMES & ANIMATIONS --- */
-/* ------------------------------------- */
-
-@keyframes pulsate {
-    0% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00; }
-    100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
+/* --- Panels (Containers) --- */
+.overlay {
+    position: fixed; /* Keep panels fixed for consistent positioning */
+    top: 50%;
+    transform: translateY(-50%);
+    width: 30%;
+    min-height: 50vh;
+    padding: 20px;
+    background-color: rgba(128, 0, 128, 0.9); /* Purple background */
+    border: 3px solid #00FF00;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+    opacity: 0;
+    visibility: hidden;
+    transition: 
+        opacity 0.5s ease-in-out, 
+        transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
-@keyframes loading {
-    0%{ transform: translateX(0); }
-    25%{ transform: translateX(15px); }
-    50%{ transform: translateX(-15px); }
-    75%{ transform: translateX(15px); }
-    100%{ transform: translateX(0); }
+/* Login Panel Styling */
+#login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 250px;
+    width: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
-
-/* ------------------------------------- */
-/* --- LOADING SCREEN STYLES --- */
-/* ------------------------------------- */
-
-#loading_screen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 1000;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: #00FF00;
-    font-size: 1.5rem;
-    transition: opacity 0.5s ease-out, visibility 0s linear 0.5s;
-}
-
-#loading_screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-}
-
-.loader {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.loader span {
-    height: 25px;
-    width: 25px;
-    margin-right: 10px;
-    border-radius: 50%;
-    background-color: #00FF00;
-    animation: loading 1.5s linear infinite;
-}
-
-/* Delay for the wave effect */
-.loader span:nth-child(1) { animation-delay: 0.1s; }
-.loader span:nth-child(2) { animation-delay: 0.2s; }
-.loader span:nth-child(3) { animation-delay: 0.3s; }
-.loader span:nth-child(4) { animation-delay: 0.4s; }
-.loader span:nth-child(5) { animation-delay: 0.5s; }
-.loader span:nth-child(6) { animation-delay: 0.6s; }
-
-
-/* ------------------------------------- */
-/* --- GENERAL STYLES & HEADINGS --- */
-/* ------------------------------------- */
-
-h2 {
-    text-align: center;
-    color: #00FF00;
-    text-shadow: 0 0 5px rgba(0, 255, 0, 0.8);
-    margin-top: 0;
-}
-
-
-/* ------------------------------------- */
-/* --- LOGIN/INPUT STYLES --- */
-/* ------------------------------------- */
 
 .login_field {
-    display: block; 
-    width: 100%; 
-    margin-bottom: 15px; 
-    padding: 12px 15px; 
-    border: 1px solid #444; 
-    border-radius: 8px; 
-    font-size: 1rem;
-    box-sizing: border-box; 
-    background-color: white; 
-    color: black; 
+    width: 80%;
+    margin: 10px 0;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    font-size: 1rem;
 }
 
-#login_btn { 
-    background-color: lightgray; 
-    color: black; 
-    font-weight: 700;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    transition: background-color 0.2s ease-in-out, transform 0.2s ease-out, box-shadow 0.2s ease-out;
+#login_btn {
+    cursor: pointer;
+    margin-top: 20px;
+    background-color: lightgray; 
+    color: black;
+    font-weight: bold;
+    border: none !important;
 }
 
-#login_btn:hover { 
-    background-color: #00CC00; 
-    transform: scale(1.02);
-    box-shadow: 0 0 15px rgba(0, 255, 0, 0.5);
+#login_btn:hover { 
+    background-color: #00CC00; 
 }
 
 
-/* ------------------------------------- */
-/* --- OVERLAY / PANEL BASE STYLES --- */
-/* ------------------------------------- */
-
-.overlay {
-    position: absolute;
-    border-radius: 1rem;
-    padding: 1.5rem;
-    width: 45%; 
-    background-color: rgba(0, 0, 0, 0.9);
-    max-height: 80vh;
-    z-index: 10;
-    
-    opacity: 0; 
-    visibility: hidden; 
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear 0.5s;
-}
-
-.overlay.visible {
-    opacity: 1; 
-    visibility: visible;
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out, visibility 0s linear;
-}
-
-/* Homework panel positioning and animation */
+/* Homework and Logs Panel Positioning */
 #hw_panel {
-    left: 1%; 
-    top: 180px;
-    transform: translateX(-100%);
+    left: 15%;
+    transform: translate(0, -50%) translateY(100%); /* Start off screen bottom */
 }
 
-#hw_panel.visible {
-    transform: translateX(0);
-}
-
-/* Log panel positioning and animation */
 #log_panel {
-    right: 1%;
-    top: 180px;
-    transform: translateX(100%);
+    right: 15%;
+    transform: translate(0, -50%) translateY(100%); /* Start off screen bottom */
 }
 
-#log_panel.visible {
-    transform: translateX(0);
-}
-
-
-/* Login panel centering and styling */
-#login {
-    background-color: rgba(0, 0, 0, 0.95);
-    border: 2px solid #00FF00;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%; 
-    max-width: 400px;
-    height: auto;
-    opacity: 0;
-    transition: opacity 0.5s ease-out;
+/* Panel Slide-In Effect */
+.overlay.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(0, -50%); /* Slide up to center position */
 }
 
 #login.visible {
-    opacity: 1;
+    transform: translate(-50%, -50%); /* Login stays centered */
 }
 
 
-/* ------------------------------------- */
-/* --- HOMEWORK / LOG LIST STYLES --- */
-/* ------------------------------------- */
+/* --- Progress Bar Styles --- */
+.progress_bar_container {
+    width: 95%;
+    height: 15px;
+    background-color: #555;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 10px auto;
+    border: 1px solid #00FF00;
+}
 
+.progress_bar {
+    height: 100%;
+    width: 0%;
+    background-color: #00FF00;
+    transition: width 0.4s ease-out;
+}
+
+/* --- Homework List Styles --- */
 .overflow_container {
-    overflow-y: auto;
-    padding: 0.5rem; 
-    border: 1px solid #00FF00; 
-    border-radius: 0.5rem;
-    background-color: rgba(0, 0, 0, 0.3);
-    margin-top: 0.5rem;
-    max-height: 300px; 
+    height: 30vh;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #00FF00;
 }
 
-.json_small {
-    font-family: "Space Mono", serif;
-    font-size: 0.75rem;
-    word-break: break-all;
-    background-color: rgba(0, 0, 0, 0.6);
-    padding: 0.5rem;
-    border-left: 3px solid white;
-    margin: 0.5rem 0;
+.task {
+    display: block;
+    margin: 5px 0;
+    padding: 3px;
+    border-bottom: 1px dashed rgba(0, 255, 0, 0.3);
 }
 
+/* --- Logging Styles (Improved) --- */
+
+/* Shortened log entry (clickable area) */
 .log-entry {
     display: block;
     margin: 5px 0;
@@ -246,27 +157,79 @@ h2 {
     line-height: 1.5;
 }
 
+/* Hover effect for clickable log entry */
 .log-entry:hover {
     background-color: rgba(0, 50, 0, 0.7); 
 }
 
+/* Hidden container for detailed JSON/long data */
+.json_small {
+    font-family: "Space Mono", monospace;
+    font-size: 0.75rem;
+    word-break: break-all;
+    white-space: pre-wrap; /* Keeps formatting from JSON.stringify(..., null, 2) */
+    background-color: rgba(0, 0, 0, 0.8);
+    padding: 0.75rem;
+    border-left: 3px solid white;
+    margin-top: 5px;
+    /* HIDDEN BY DEFAULT */
+    display: none; 
+}
+
+/* Show the detailed log when the parent log-entry is expanded */
 .log-entry.expanded .json_small {
     display: block;
 }
 
+/* Highlight the log entry when it is expanded */
 .log-entry.expanded {
-    border-left: 3px solid #FFFF00;
+    border-left: 3px solid #FFFF00; /* Change border color when expanded */
     background-color: rgba(0, 0, 0, 0.7);
 }
 
-.task {
-    display: block;
-    padding: 0.2rem 0;
+/* --- Settings Dialog --- */
+dialog {
+    padding: 20px;
+    border: 3px solid #00FF00;
+    background-color: rgba(0, 0, 0, 0.95);
+    color: white;
+    border-radius: 10px;
 }
 
-/* ------------------------------------- */
-/* --- BUTTONS & PROGRESS BAR ANIMATIONS --- */
-/* ------------------------------------- */
+/* --- Button Styling (Shiny Effect) --- */
+
+@keyframes pulsate {
+    0% { box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00; }
+    100% { box-shadow: 0 0 15px #00FF00, 0 0 20px rgba(0, 255, 0, 0.5); }
+}
+
+@keyframes button_glow {
+    from {
+        box-shadow: 0 0 0px rgba(0, 255, 0, 0.5);
+    }
+    to {
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.8), 0 0 5px #00FF00;
+    }
+}
+
+.animated-button {
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 700;
+    transition: 
+        box-shadow 0.3s ease-out, 
+        transform 0.2s ease-out,
+        background-color 0.2s ease-in-out;
+    border: 2px solid #00FF00 !important; 
+}
+
+/* Base glow effect when hovering/active */
+.animated-button:hover,
+.animated-button:focus {
+    animation: button_glow 0.5s forwards;
+    transform: translateY(-1px); /* slight lift */
+}
 
 .settings_button {
     position: fixed; 
@@ -274,113 +237,20 @@ h2 {
     padding: 0.75rem;
     background-color: rgba(0, 0, 0, 0.8);
     color: white;
-    border: 2px solid #00FF00;
-    border-radius: 8px;
-    font-weight: 700;
     z-index: 30;
     text-shadow: 0 0 5px black;
+    /* Continuous pulsate animation */
     animation: pulsate 1.5s infinite alternate; 
-    transition: background-color 0.2s ease-in-out;
 }
 
 #settings_button { right: 10px; }
 #logout_button { right: 120px; }
 
-.animated-button {
-    transition: 
-        box-shadow 0.3s ease-out, 
-        transform 0.2s ease-out,
-        background-color 0.2s ease-in-out;
-}
 
+/* Specific style for START HOMEWORK button */
 #do_hw {
-    background-color: #00FF00;
-    color: black;
-    font-weight: 900;
-    border: 3px solid #00CC00;
-    border-radius: 8px;
-    padding: 10px 20px;
-    display: block; 
-    width: 100%;
-    box-sizing: border-box;
-    margin: 2rem 0 0 0; 
-    transition: background-color 0.2s, transform 0.2s;
-}
-
-#do_hw:hover {
-    background-color: #00CC00;
-    transform: translateY(-2px);
-}
-
-.progress_bar_container {
-    height: 1rem;
-    background-color: #333333; 
-    border-radius: 5px;
-    overflow: hidden;
-    margin: 10px 0; 
-}
-
-.progress_bar { 
-    padding: 0;
-    width: 0%;
-    height: 100%;
-    background-color: #00ff00;
-    transition: width 0.6s ease-out; 
-    box-shadow: 0 0 8px rgba(0, 255, 0, 0.7); 
-}
-
-/* ------------------------------------- */
-/* --- DIALOG / SETTINGS STYLES --- */
-/* ------------------------------------- */
-
-dialog#settings {
-    background-color: rgba(0, 0, 0, 0.95);
-    border: 2px solid #00FF00;
-    border-radius: 1rem;
-    padding: 2rem;
-    color: white;
-    font-family: inherit;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.8);
-    max-width: 500px;
-    width: 90%;
-    z-index: 40;
-}
-
-dialog#settings::backdrop {
-    background-color: rgba(0, 0, 0, 0.7);
-}
-
-input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 8px;
-    background: #333;
-    border-radius: 5px;
-    margin: 10px 0;
-}
-
-input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    background: #00FF00;
-    cursor: pointer;
-    border-radius: 50%;
-    border: 2px solid black;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
-}
-
-input[type="range"]::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
-    background: #00FF00;
-    cursor: pointer;
-    border-radius: 50%;
-    border: 2px solid black;
-    box-shadow: 0 0 5px rgba(0, 255, 0, 0.7);
-}
-
-.hideable {
-    display: none;
+    background-color: #00FF00;
+    color: black;
+    font-weight: 900;
+    border: 3px solid #00CC00;
 }
