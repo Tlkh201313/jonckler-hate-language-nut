@@ -8,20 +8,18 @@
     </head>
 
     <body>
-                
-                <div id="main-content">
-            
-            <img src="./languagenut.jpeg" width='30%'>
+                
+        <div id="main-content" class="hidden-initially">
+            <img src="./languagenut.jpeg" width='30%'>
 
-                        <div id="login" class="overlay"> 
+            <div id="login" class="overlay"> 
                 <input class="login_field" id="username_input" type="text" placeholder="Username">
                 <input class="login_field" id="password_input" type="password" placeholder="Password">
                 
-                <button class="login_field **animated-button**" id="login_btn"> Log In </button>
+                <button class="login_field animated-button" id="login_btn"> Log In </button>
             </div>
 
-
-                        <div id="hw_panel" class="overlay">
+            <div id="hw_panel" class="overlay">
                 <h2>Homeworks</h2>
                 <input type="checkbox" id="selectall">
                 <label for="selectall">select all</label>
@@ -33,11 +31,11 @@
                 <div id="hw_container" class="overflow_container">
                 </div>
                 
-                <button id="do_hw" class="**animated-button**" style="margin: 2rem;">START SELECTED HOMEWORK</button>
+                <button id="do_hw" class="animated-button" style="margin: 2rem;">START SELECTED HOMEWORK</button>
             </div>
 
 
-                        <div id="log_panel" class="overlay">
+            <div id="log_panel" class="overlay">
                 <h2>Logs</h2>
                 <div class="progress_bar_container">
                     <div id="log_bar" class="progress_bar"></div>
@@ -47,7 +45,7 @@
             </div>
 
 
-                        <dialog id="settings">
+            <dialog id="settings">
                 [Esc] to exit
                 <br>
                 Select the time you want your homework to appear to be done in:
@@ -56,9 +54,8 @@
                 Current speed: <span id="speed_display"></span> 
             </dialog>
             
-                        <button id="settings_button" class="settings_button **animated-button**">Settings</button>
-            <button id="logout_button" class="settings_button **animated-button**" style="right: 120px;">Log Out</button>
-
-        </div>         <script src="index.js"></script>
+            <button id="settings_button" class="settings_button animated-button">Settings</button>
+            <button id="logout_button" class="settings_button animated-button" style="right: 120px;">Log Out</button>
+        </div>         <script src="index.js"></script>
     </body>
 </html>
